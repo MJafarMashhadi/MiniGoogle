@@ -1,0 +1,26 @@
+هر مقاله:
+{
+    // crawl:
+    title: "",
+    id: 1111,
+    abstract: "",
+    authors: [
+        {name: "", id: 222}
+    ],
+    page: "http://....",
+    cited_in: [1,4,5,7],
+    refrences: [10,3,87],
+ 
+    // Badaz crawl:
+    pageRank: 10.5,
+    cluster: 6,
+}
+
+کلاسترها:
+[
+    {
+        id: 0,
+        name: "متن نماینده کلاستر", 
+        papers: [/*قانع نشد :دی*/],
+    },
+]
