@@ -21,4 +21,16 @@ def getPage(url):
     print('abstract : ')
     print(abstract)
 
+
     return
+
+
+
+
+# br  = Firefox()
+# >>> br.get(url)
+# >>> br.find_element_by_class_name('tab-link')
+# <selenium.webdriver.remote.webelement.WebElement (session="705d09f3-d126-4ac9-9676-75bcc09a8be9", element="{88fe3c16-ef63-46da-9e65-994a9977f544}")>
+# >>> b = br.find_element_by_class_name('tab-link')
+# >>> b.click()
+# >>> br.page_source

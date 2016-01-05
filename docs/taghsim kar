@@ -1,0 +1,31 @@
+Crawler (mh)
+    queue
+    parser
+    downloader
+    duplicate URL
+    duplicate Content
+
+Elastic Search (mj)
+    add page rank
+    add cluster label
+
+Clustering
+    K-means
+    Text agent
+
+page Rank (mh)
+    using numpy
+
+UI (mj)
+    flask
+
+_________________________________________________________________________________________________________________________________________
+
+
+Crawler --> json file
+
+json file --> page Rank --> json file
+
+json file --> Clustering --> json file
+
+final json file --> Elastic 
