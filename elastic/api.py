@@ -80,20 +80,13 @@ class ElasticAPI:
         :return:
         """
         documents = map(lambda x: x.replace('\r?\n', ''), documents)
-        document_jsons = map(json.loads, documents)
+        document_ids = map(lambda js: js['id'], map(json.loads, documents))
         request_data = []
-        for document, document_json in zip(documents, document_jsons):
-            id = document_json['id']
-            header = json.dumps({
-                'index': {
-                    '_index': index_name,
-                    '_type': document_type,
-                    '_id': id
-                }
-            })
+        for document, id in zip(documents, document_ids):
+            header = json.dumps({'index': {'_id': id}})
             request_data += [header, document]
 
-        bulk_request = requests.post('/'.join([self.base_url, '_bulk']), data='\n'.join(request_data))
+        bulk_request = requests.post('/'.join([self.base_url, index_name, document_type, '_bulk']), data='\n'.join(request_data))
         return bulk_request
 
 
