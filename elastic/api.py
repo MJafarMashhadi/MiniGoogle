@@ -1,4 +1,5 @@
 import json
+
 import requests
 from util import read_file, list_files
 
@@ -11,17 +12,18 @@ class ElasticAPI:
         :param base_folder: ../retrievedDocs/index/
         :return:
         """
+        import os
         self.base_url = base_url
-        self.base_folder = base_folder
+        self.base_folder = os.path.normpath(base_folder)
         if self.base_folder[-1] != '/':
             self.base_folder += '/'
         if self.base_url[-1] == '/':
             self.base_url = self.base_url[:-1]
 
     def get_index_url(self, index_name, doc_type, doc_id):
-        return '/'.join([self.base_url, index_name, doc_type, doc_id])
+        return '/'.join(map(str, [self.base_url, index_name, doc_type, doc_id]))
 
-    def add_document_by_id(self, id):
+    def add_document_by_id(self, id, index_name, document_type):
         """
         reads document file from index location.
         :param id:
@@ -33,18 +35,18 @@ class ElasticAPI:
         if contents is None:
             return (False, None)
         else:
-            return self.add_document(contents)
+            return self.add_document(contents, index_name, document_type)
 
-    def add_document(self, json):
+    def add_document(self, json_contents, index_name, document_type):
         """
         Add document based on json
-        :param json:
+        :param json_contents:
         :return: tuple <Success(bool), response details(dictionary)>
         """
-        parsed = json.loads(json)
-        index_url = self.get_index_url('papers', 'paper', parsed['id'])
-        response = requests.put(index_url, data=json)
-        return response['created'], response
+        parsed = json.loads(json_contents)
+        index_url = self.get_index_url(index_name, document_type, parsed['id'])
+        elastic_response = requests.put(index_url, data=json_contents).json()
+        return elastic_response['created'], elastic_response
 
     def bulk_add_documents_in_directory(self, folder, index_name, document_type, pattern='*.json'):
         """

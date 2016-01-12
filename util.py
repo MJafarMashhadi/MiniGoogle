@@ -1,10 +1,12 @@
+import fnmatch
 import os
-import re, fnmatch
+import re
 
 
 def read_file(address):
+    address = os.path.normpath(address)
     with open(address, 'r') as f:
-        content = f.readall()
+        content = f.read()
         return content
 
 
