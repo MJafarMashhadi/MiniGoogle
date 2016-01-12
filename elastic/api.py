@@ -88,7 +88,15 @@ class ElasticAPI:
             header = json.dumps({'index': {'_id': id}})
             request_data += [header, document]
 
+        print('\n'.join(request_data))
         bulk_request = requests.post('/'.join([self.base_url, index_name, document_type, '_bulk']), data='\n'.join(request_data))
         return bulk_request
 
 
+def test():
+    api = ElasticAPI('http://localhost:9200', '../retrievedDocs/afterCrawl')
+    api.add_document_by_id('285458515', 'article', 'papers')
+    api.bulk_add_documents_in_directory('../retrievedDocs/afterCrawl/', 'article', 'papers')
+
+if __name__ == '__main__':
+    test()
