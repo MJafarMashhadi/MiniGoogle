@@ -1,6 +1,5 @@
 import json
 import requests
-import os
 from util import read_file, list_files
 
 
