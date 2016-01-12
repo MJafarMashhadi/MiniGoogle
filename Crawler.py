@@ -11,6 +11,7 @@ class Crawler:
         self.visitedTitles = set()
         self.numberOfVisitedPage = 0
         self.queue = list()
+        self.baseURL = 'https://www.researchgate.net/'
     
     def getPage(self, url):
         id = re.findall(r'publication/(?P<id>\d+)_',url)[0]
@@ -61,7 +62,7 @@ class Crawler:
         print('bye')
         return
     
-    def parse(self, url):
+    def parseArticlePage(self, url):
         id = self.getIDFromURL(url)
 
         r = requests.get(url)
@@ -78,7 +79,7 @@ class Crawler:
             'accept': 'application/json',
             'x-requested-with': 'XMLHttpRequest',
         }
-        baseURL = 'www.researchgate.net/'
+
 
         js_url_citedin = 'https://www.researchgate.net/publicliterature.PublicationIncomingCitationsList.html?publicationUid='+id+'&useUpdatedLayoutForPublicationItems=false&loadAuthorImageLinks=false&getCommentCount=false&usePlainButton=false&useEnrichedContext=false&showAbstract=false&showType=false&showDownloadButton=false&showOpenReviewButton=false&showPublicationPreview=false&swapJournalAndAuthorPositions=false&showContexts=false&limit=10&loadMoreCount=1'
         r2 = requests.get(js_url_citedin, headers=headers)
@@ -86,7 +87,7 @@ class Crawler:
         citedinURLs = []
         citedinIDs =[]
         for citation in jsonObject['result']['data']['citationItems']:
-            citedinURLs.append(baseURL+citation['data']['url'])
+            citedinURLs.append(self.baseURL+citation['data']['url'])
             citedinIDs.append(citation['data']['publicationUid'])
 
         js_url_refrence = 'https://www.researchgate.net/publicliterature.PublicationCitationsList.html?publicationUid='+id+'&useUpdatedLayoutForPublicationItems=false&loadAuthorImageLinks=false&getCommentCount=false&usePlainButton=false&useEnrichedContext=false&showAbstract=false&showType=false&showDownloadButton=false&showOpenReviewButton=false&showPublicationPreview=false&swapJournalAndAuthorPositions=false&showContexts=false&limit=10&loadMoreCount=1'
@@ -95,7 +96,7 @@ class Crawler:
         refrenceURLs = []
         refrenceIDs = []
         for refrence in jsonObject['result']['data']['citationItems']:
-            refrenceURLs.append(baseURL+refrence['data']['url'])
+            refrenceURLs.append(self.baseURL+refrence['data']['url'])
             refrenceIDs.append(refrence['data']['publicationUid'])
 
         result ={}
@@ -121,25 +122,50 @@ class Crawler:
     def crawlPage(self, url):
         if self.chceckDupURL(url):
             return
-        parsedPage = self.parse(url)
+        parsedPage = self.parseArticlePage(url)
         if self.checkDupTitel(parsedPage['title']):
             return
         self.queue.extend(parsedPage['newURLs'])
         del parsedPage['newURLs']
+        with open('retrivedDocs/afterCrawl/'+parsedPage['id']+'.json', 'w') as outfile:
+            json.dump(parsedPage, outfile)
         self.numberOfVisitedPage +=1
         self.visitedTitles.add(parsedPage['title'])
         self.visitedURLs.add(parsedPage['page'])
 
-        with open('retrivedDocs/afterCrawl/'+parsedPage['id']+'.json', 'w') as outfile:
-            json.dump(parsedPage, outfile)
-
     def crawl(self,startingURL , n):
-        self.queue.append(startingURL)
-        while self.numberOfVisitedPage < n and self.queue.count() >0 :
-            self.crawlPage(self.queue.pop(0))
+        try:
+            self.queue.extend(self.parseProfilePage(startingURL))
+        except:
+            print('cannot parse profile page')
+            with open("retrivedDocs/afterCrawl/ERROR.txt", "a") as ErrorFile:
+                    ErrorFile.write('cannot parse profile page\n')
+
+
+        while self.numberOfVisitedPage < n and len(self.queue) >0 :
+            currentURL = self.queue.pop(0)
+            try:
+                self.crawlPage(currentURL)
+                print(self.numberOfVisitedPage.__str__()+' : ' + currentURL)
+            except:
+                print('Error : '+ currentURL)
+                with open("retrivedDocs/afterCrawl/ERROR.txt", "a") as ErrorFile:
+                    ErrorFile.write(currentURL+'\n')
+
+
 
         with open('retrivedDocs/afterCrawl/Map.txt', 'w') as outfile:
             json.dump(self.URLIDMap, outfile)
+
+    def parseProfilePage(self,url):#return top 10 article url
+        r = requests.get(url)
+        s = BeautifulSoup(r.text,'html.parser')
+        articles = s.findAll('a',class_='ga-publication-item')
+        result= []
+        for article in articles[:10]:
+            result.append(self.baseURL+article['href'])
+        return result
+
 # br  = Firefox()
 # >>> br.get(url)
 # >>> br.find_element_by_class_name('tab-link')
