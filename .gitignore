@@ -113,4 +113,5 @@ crashlytics.properties
 crashlytics-build.properties
 fabric.properties
 
-retrivedDocs/
+retrievedDocs/
+bower_components
