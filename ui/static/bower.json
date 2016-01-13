@@ -1,0 +1,30 @@
+{
+  "name": "MiniGoogle",
+  "authors": [
+    "MJafar Mashhadi <raindigital2007@gmail.com>",
+    "MohammadHossein Sharafi <m.sharafi72@gmail.com>"
+  ],
+  "description": "Modern Information Retrieval 3rd Course project",
+  "main": "",
+  "moduleType": [],
+  "keywords": [
+    "MIR",
+    "Modern",
+    "Information",
+    "Retrieval",
+    "MiniGoogle"
+  ],
+  "license": "MIT",
+  "homepage": "",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "~3.3.6"
+  }
+}

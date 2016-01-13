@@ -1,0 +1,39 @@
+<link rel="stylesheet"
+      href="{{ url_for('static', filename='bower_components/bootstrap/dist/css/bootstrap.min.css') }}"/>
+<link rel="stylesheet"
+      href="{{ url_for('static', filename='bower_components/bootstrap/dist/css/bootstrap-theme.min.css') }}"/>
+<script type="application/javascript"
+        src="{{ url_for('static', filename='bower_components/jquery/dist/jquery.min.js') }}"></script>
+<script type="application/javascript"
+        src="{{ url_for('static', filename='bower_components/bootstrap/dist/js/bootstrap.min.js') }}"></script>
+<style>
+    #submit {
+        font-family: 'Glyphicons Halflings' !important;
+        font-style: normal;
+        font-weight: normal;
+        line-height: 1;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+    body {
+        background: #fdfdfd;
+        border-top: solid 3px #608fff;
+        padding-top: 5px;
+    }
+    .search-form-wrapper {
+        width: 100%;
+        border: 1px rgba(0, 0, 0, 0.20) solid;
+        background: white;
+        padding: 0;
+        border-radius: 5px;
+    }
+</style>
+
+<script type="application/javascript">
+    $(function () {
+        $('#submit').on('click', function (e) {
+            console.log('submit div clicked');
+            $('form').trigger('submit');
+        });
+    });
+</script>
