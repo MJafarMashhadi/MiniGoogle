@@ -59,7 +59,7 @@
 </header>
 <div class="container-fluid">
     <div class="col-lg-10">
-        {{ results | length }} results in {{ duration }} seconds.
+        {{ results | length }} results in <strong>{{ duration }}</strong>.
         <div class="container-fluid">
             {% for result in results %}
                 <div class="row">
