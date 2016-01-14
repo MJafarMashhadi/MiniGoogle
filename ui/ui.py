@@ -1,9 +1,10 @@
 import json
 
+from timer import Timer
+
 from elastic.api import ElasticAPI
 from flask import Flask, render_template, redirect, url_for
 from flask import request
-from timer import Timer
 
 app = Flask('minigoogle')
 app.debug = True
@@ -32,19 +33,24 @@ def search():
     )
 
 
-@app.route('/pagerank')
+@app.route('/admin')
+def admin():
+    return render_template('admin.html')
+
+
+@app.route('/admin/pagerank')
 def page_rank():
 
     pass
 
 
-@app.route('/index')
+@app.route('/admin/index')
 def index():
 
     timer = Timer()
     timer.start()
-    api = ElasticAPI('http://localhost:9200/', '../retrievedDocs/afterPageRank')
-    response = api.bulk_add_documents_in_directory('../retrievedDocs/afterPageRank', 'articles', 'paper').json()
+    api = ElasticAPI('http://localhost:9200/', '../retrievedDocs/afterCrawl')
+    response = api.bulk_add_documents_in_directory('../retrievedDocs/afterCrawl', 'articles', 'paper').json()
     pretty_response = json.dumps(response, indent=True)
     timer.end()
 

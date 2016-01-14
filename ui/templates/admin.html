@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Google Administration Panel</title>
+    {% include 'header.html' %}
+</head>
+<body>
+
+<div class="container">
+    <h1>Manage Google<sub>mini</sub></h1>
+
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <div class="container">
+                <ul class="nav nav-pills">
+                    <li><a href="{{ url_for('page_rank') }}">Calculate page ranks</a></li>
+                    <li><a href="{{ url_for('index') }}">Add docs to index</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="panel-footer">
+            <p>go <a href="{{ url_for('home') }}">back home</a></p>
+        </div>
+    </div>
+</div>
+</body>
+</html>
