@@ -33,7 +33,15 @@
 <div class="container-fluid">
     <div class="col-lg-10">
         <p>
-            Added {{ results | length }} documents in <strong>{{ duration }}</strong>.
+            {% if success %}
+                <p class="alert alert-success">
+                    Added {{ numdocs }} documents in <strong>{{ duration }}</strong>
+                </p>
+            {% else %}
+                <p class="alert alert-danger">
+                    Error occurred
+                </p>
+            {% endif %}
         </p>
         <h5>Elastic search response:</h5>
         <pre class="container">{{ elastic_response }}</pre>
