@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Indexing results</title>
+    {% include 'header.html' %}
+    <style>
+        header {
+            border-bottom: rgba(0, 0, 0, 0.22);
+            background: #fafafa;
+            padding: 7px 5px;
+            margin-bottom: 10px;
+        }
+
+        header div {
+            display: inline-block;
+            margin: auto 5px;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <div class="logo">
+        <h3 style="line-height: 1em; margin: 0">Google<sub>mini</sub></h3>
+    </div>
+
+    <div class="">
+        <p>
+            Adding processed documents to index
+        </p>
+    </div>
+</header>
+<div class="container-fluid">
+    <div class="col-lg-10">
+        <p>
+            Added {{ results | length }} documents in {{ duration }} seconds.
+        </p>
+        <h5>Elastic search response:</h5>
+        <pre class="container">
+            {{ elastic_response }}
+        </pre>
+    </div>
+    <div class="col-lg-2">
+        {% include 'ads.html' %}
+    </div>
+</div>
+</body>
+</html>

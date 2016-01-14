@@ -1,10 +1,11 @@
-from random import randint
+import json
 
-from flask import Flask, render_template
+from elastic.api import ElasticAPI
+from flask import Flask, render_template, redirect, url_for
 from flask import request
+from timer import Timer
 
 app = Flask('minigoogle')
-# app = Flask(__name__)
 app.debug = True
 
 
@@ -16,11 +17,40 @@ def home():
 @app.route('/search')
 def search():
     query_string = request.args.get('q')
-    print (query_string)
-    return render_template('results.html', 
+    if not query_string or len(query_string) == 0:
+        return redirect(url_for('home'))
+
+    print ('Searching for', query_string)
+    timer = Timer()
+    timer.start()
+    # TODO: Do stuff here
+    timer.end()
+    return render_template('results.html',
         query=query_string,
         results=[],
-        duration=randint(1,100)/100.0
+        duration=timer.get_time_taken_pretty()
+    )
+
+
+@app.route('/pagerank')
+def page_rank():
+
+    pass
+
+
+@app.route('/index')
+def index():
+
+    timer = Timer()
+    timer.start()
+    api = ElasticAPI('http://localhost:9200/', '../retrievedDocs/afterPageRank')
+    response = api.bulk_add_documents_in_directory('../retrievedDocs/afterPageRank', 'articles', 'paper').json()
+    pretty_response = json.dumps(response, indent=True)
+    timer.end()
+
+    return render_template('indexing_result.html',
+        duration=timer.get_time_taken_pretty(),
+        elastic_response=pretty_response
     )
 
 
