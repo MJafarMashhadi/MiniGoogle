@@ -11,7 +11,6 @@ def read_file(address):
 
 
 def list_files(directory_address, pattern='*.*'):
-    file_names = []
     regex = re.compile(fnmatch.translate(pattern))
     dir_list = os.listdir(directory_address)
 
