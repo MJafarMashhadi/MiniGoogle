@@ -96,7 +96,7 @@ class Crawler:
         self.addLinkToQueue(parsedPage['newURLs'])
 
         del parsedPage['newURLs']
-        with open('retrivedDocs/afterCrawl/' + parsedPage['id'] + '.json', 'w') as outfile:
+        with open('retrievedDocs/afterCrawl/' + parsedPage['id'] + '.json', 'w') as outfile:
             json.dump(parsedPage, outfile)
         self.lockAdd.acquire()
         self.numberOfVisitedPage += 1
@@ -106,13 +106,13 @@ class Crawler:
         self.lockAdd.release()
 
     def crawl(self, startingURL, n):
-        os.makedirs('retrivedDocs/afterCrawl/', exist_ok=True)
+        os.makedirs('retrievedDocs/afterCrawl/', exist_ok=True)
         self.n = n
         try:
             self.queue.extend(self.parseProfilePage(startingURL))
         except:
             print('cannot parse profile page')
-            with open("retrivedDocs/afterCrawl/ERROR.txt", "a") as ErrorFile:
+            with open("retrievedDocs/afterCrawl/ERROR.txt", "a") as ErrorFile:
                 ErrorFile.write('cannot parse profile page\n')
 
         threads = [CrawlThread(self) for t in range(NUMBER_OF_THREADS)]
@@ -123,7 +123,7 @@ class Crawler:
         for t in threads:
             t.join()
 
-        with open('retrivedDocs/afterCrawl/Map.txt', 'w') as outfile:
+        with open('retrievedDocs/afterCrawl/Map.txt', 'w') as outfile:
             json.dump(self.URLIDMap, outfile)
 
     def parseProfilePage(self, url):  # return top 10 article url
@@ -151,7 +151,7 @@ class CrawlThread(threading.Thread):
                 print(self.crawler.numberOfVisitedPage.__str__() + ' : ' + currentURL)
             except:
                 print('Error : ' + currentURL)
-                with open("retrivedDocs/afterCrawl/ERROR.txt", "a") as ErrorFile:
+                with open("retrievedDocs/afterCrawl/ERROR.txt", "a") as ErrorFile:
                     ErrorFile.write(currentURL + '\n')
 
 
