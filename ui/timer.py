@@ -26,10 +26,12 @@ class Timer:
         if len(plural_name) == 0:
             plural_name = '{}s'.format(name)
 
-        if value > 1:
-            return '{} {}'.format(value, plural_name)
-        elif value == 1:
+        if value == 1:
             return 'one {}'.format(name)
+        elif value == 0:
+            return ''
+        else:
+            return '{} {}'.format(value, plural_name)
 
     def get_time_taken_pretty(self):
         time_taken = self.get_time_taken()
