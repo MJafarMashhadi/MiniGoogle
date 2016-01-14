@@ -16,6 +16,11 @@
             display: inline-block;
             margin: auto 5px;
         }
+
+        pre {
+            max-height: 440px;
+            overflow-y: scroll;
+        }
     </style>
 </head>
 <body>
@@ -32,19 +37,27 @@
 </header>
 <div class="container-fluid">
     <div class="col-lg-10">
-        <p>
-            {% if success %}
-                <p class="alert alert-success">
-                    Added {{ numdocs }} documents in <strong>{{ duration }}</strong>
-                </p>
-            {% else %}
-                <p class="alert alert-danger">
-                    Error occurred
-                </p>
-            {% endif %}
-        </p>
-        <h5>Elastic search response:</h5>
-        <pre class="container">{{ elastic_response }}</pre>
+        {% if success %}
+            <p class="alert alert-success">
+                Added {{ numdocs }} documents in <strong>{{ duration }}</strong>
+            </p>
+        {% else %}
+            <p class="alert alert-danger">
+                Error occurred
+            </p>
+        {% endif %}
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                Elastic search response
+            </div>
+            <div class="panel-body">
+                <pre class="container">{{ elastic_response }}</pre>
+            </div>
+            <div class="panel-footer">
+                <a href="{{ url_for('admin') }}">Back to admin</a>
+            </div>
+        </div>
+
     </div>
     <div class="col-lg-2">
         {% include 'ads.html' %}
