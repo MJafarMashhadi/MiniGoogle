@@ -7,6 +7,7 @@
     <style>
         .container {
         }
+
         h1 {
             text-align: center;
             font-size: 3em;
@@ -14,23 +15,30 @@
             opacity: 0.69;
         }
 
-    .search-form-wrapper input[type=text] {
-        height: 1.5em;
-        font-size: 20px;
-        line-height: 1.5em;
-        border: none;
-        padding: 2px;
-        margin: 3px 0 3px 0;
-        width: 100%;
-    }
+        .search-form-wrapper input[type=text] {
+            height: 1.5em;
+            font-size: 20px;
+            line-height: 1.5em;
+            border: none;
+            padding: 2px;
+            margin: 3px 0 3px 0;
+            width: 100%;
+        }
+
         .centeroid {
             margin: 0 auto;
             display: inline;
             text-align: center;
             width: 0;
         }
+
         .centeroid input {
             margin: 5px 2.5px;
+        }
+
+        footer {
+            position: absolute;
+            bottom: 20px;
         }
     </style>
 </head>
@@ -44,16 +52,23 @@
             <div class="col-lg-6 col-lg-offset-3">
                 <form method="get" action="/search">
                     <div class="search-form-wrapper">
-                        <input name="q" tabindex="1" type="text" autocomplete="false" autofocus="true" />
+                        <input name="q" tabindex="1" type="text" autocomplete="false" autofocus="true"/>
                     </div>
                     <div class="centeroid">
-                        <input name="search" tabindex="2" type="submit" class="btn btn-default" value="Google search" />
-                        <input name="lucky" tabindex="3" type="submit" class="btn btn-default" value="I'm feeling lucky" />
+                        <input name="search" tabindex="2" type="submit" class="btn btn-default" value="Google search"/>
+                        <input name="lucky" tabindex="3" type="submit" class="btn btn-default"
+                               value="I'm feeling lucky"/>
                     </div>
                 </form>
             </div>
         </div>
     </div>
+    <footer>
+        <ul class="nav nav-pills">
+            <li><a href="{{ url_for('page_rank') }}">Calculate page ranks</a></li>
+            <li><a href="{{ url_for('index') }}">Add docs to index</a></li>
+        </ul>
+    </footer>
 </div>
 </body>
 </html>
