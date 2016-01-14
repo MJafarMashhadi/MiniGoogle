@@ -6,6 +6,9 @@ import requests
 from bs4 import BeautifulSoup
 import re
 import json
+import os
+
+NUMBER_OF_THREADS = 32
 
 
 class Crawler:
@@ -63,7 +66,7 @@ class Crawler:
         result['page'] = url
         result['cited_in'] = citedinIDs
         result['refrences'] = refrenceIDs
-        result['newURLs'] = citedinURLs + refrenceURLs;
+        result['newURLs'] = citedinURLs + refrenceURLs
         return result
 
     def getIDFromURL(self, url):
@@ -103,6 +106,7 @@ class Crawler:
         self.lockAdd.release()
 
     def crawl(self, startingURL, n):
+        os.makedirs('retrivedDocs/afterCrawl/', exist_ok=True)
         self.n = n
         try:
             self.queue.extend(self.parseProfilePage(startingURL))
@@ -111,8 +115,7 @@ class Crawler:
             with open("retrivedDocs/afterCrawl/ERROR.txt", "a") as ErrorFile:
                 ErrorFile.write('cannot parse profile page\n')
 
-        numberOfThread = 16
-        threads = [crawlThread(self) for t in range(numberOfThread)]
+        threads = [CrawlThread(self) for t in range(NUMBER_OF_THREADS)]
 
         for t in threads:
             t.start()
@@ -133,7 +136,7 @@ class Crawler:
         return result
 
 
-class crawlThread(threading.Thread):
+class CrawlThread(threading.Thread):
     def __init__(self, c):
         threading.Thread.__init__(self)
         self.crawler = c
@@ -155,7 +158,7 @@ class crawlThread(threading.Thread):
 def main():
     c = Crawler()
     url = 'http://www.researchgate.net/researcher/8159937_Zoubin_Ghahramani'
-    c.crawl(url, 50)
+    c.crawl(url, 100)
 
 
 if __name__ == '__main__':
