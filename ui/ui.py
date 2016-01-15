@@ -1,11 +1,11 @@
 import json
 
-from timer import Timer
-
-import os
 from elastic.indexing_api import IndexingAPI
 from flask import Flask, render_template, redirect, url_for
 from flask import request
+from settings import DOCUMENTS_DIR, ELASTIC_URL, INDEX_NAME, DOCUMENT_TYPE
+from .timer import Timer
+
 
 app = Flask('minigoogle')
 app.debug = True
@@ -49,9 +49,9 @@ def page_rank():
 def index():
     timer = Timer()
     timer.start()
-    retrieved_path = os.path.normpath(__file__ + '/../../retrievedDocs/afterCrawl')
-    api = IndexingAPI('http://localhost:9200/', retrieved_path)
-    response = api.bulk_add_documents_in_directory(retrieved_path, 'articles', 'paper').json()
+    retrieved_path = DOCUMENTS_DIR
+    api = IndexingAPI(ELASTIC_URL, retrieved_path)
+    response = api.bulk_add_documents_in_directory(retrieved_path, INDEX_NAME, DOCUMENT_TYPE).json()
     success = not response['errors']
     num_docs = len(response['items'])
     pretty_response = json.dumps(response, indent=True)

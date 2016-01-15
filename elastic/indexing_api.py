@@ -95,9 +95,10 @@ class IndexingAPI:
 
 
 def test():
-    api = IndexingAPI('http://localhost:9200', '../retrievedDocs/afterCrawl')
+    from settings import AFTER_CRAWL_BASE_DIR, ELASTIC_URL, DOCUMENT_TYPE, INDEX_NAME
+    api = IndexingAPI(ELASTIC_URL, AFTER_CRAWL_BASE_DIR)
     api.add_document_by_id('285458515', 'article', 'papers')
-    api.bulk_add_documents_in_directory('../retrievedDocs/afterCrawl/', 'article', 'papers')
+    api.bulk_add_documents_in_directory(AFTER_CRAWL_BASE_DIR, INDEX_NAME, DOCUMENT_TYPE)
 
 if __name__ == '__main__':
     test()
