@@ -1,14 +1,15 @@
-import threading
-
 __author__ = 'mohammad hosein'
 
+import json
+import threading
+
+import os
+import re
 import requests
 from bs4 import BeautifulSoup
-import re
-import json
-import os
-
-NUMBER_OF_THREADS = 32
+from settings import NUMBER_OF_THREADS, START_PAGE, MIN_NUMBER_OF_DOCS, \
+    MAP_FILE_NAME, ERRORS_FILE_NAME, AFTER_CRAWL_BASE_DIR
+from .crawl_thread import CrawlThread
 
 
 class Crawler:
@@ -96,7 +97,8 @@ class Crawler:
         self.addLinkToQueue(parsedPage['newURLs'])
 
         del parsedPage['newURLs']
-        with open('retrievedDocs/afterCrawl/' + parsedPage['id'] + '.json', 'w') as outfile:
+        file_name = '{}.json'.format(parsedPage['id'])
+        with open(os.path.join(AFTER_CRAWL_BASE_DIR , file_name), 'w') as outfile:
             json.dump(parsedPage, outfile)
         self.lockAdd.acquire()
         self.numberOfVisitedPage += 1
@@ -106,13 +108,13 @@ class Crawler:
         self.lockAdd.release()
 
     def crawl(self, startingURL, n):
-        os.makedirs('retrievedDocs/afterCrawl/', exist_ok=True)
+        os.makedirs(AFTER_CRAWL_BASE_DIR, exist_ok=True)
         self.n = n
         try:
             self.queue.extend(self.parseProfilePage(startingURL))
         except:
             print('cannot parse profile page')
-            with open("retrievedDocs/afterCrawl/ERROR.txt", "a") as ErrorFile:
+            with open(os.path.join(AFTER_CRAWL_BASE_DIR, ERRORS_FILE_NAME), "a") as ErrorFile:
                 ErrorFile.write('cannot parse profile page\n')
 
         threads = [CrawlThread(self) for t in range(NUMBER_OF_THREADS)]
@@ -123,7 +125,7 @@ class Crawler:
         for t in threads:
             t.join()
 
-        with open('retrievedDocs/afterCrawl/Map.txt', 'w') as outfile:
+        with open(os.path.join(AFTER_CRAWL_BASE_DIR, MAP_FILE_NAME), 'w') as outfile:
             json.dump(self.URLIDMap, outfile)
 
     def parseProfilePage(self, url):  # return top 10 article url
@@ -136,29 +138,11 @@ class Crawler:
         return result
 
 
-class CrawlThread(threading.Thread):
-    def __init__(self, c):
-        threading.Thread.__init__(self)
-        self.crawler = c
-
-    def run(self):
-        while self.crawler.numberOfVisitedPage < self.crawler.n and len(self.crawler.queue) > 0:
-            self.crawler.lockQueue.acquire()
-            currentURL = self.crawler.queue.pop(0)
-            self.crawler.lockQueue.release()
-            try:
-                self.crawler.crawlPage(currentURL)
-                print(self.crawler.numberOfVisitedPage.__str__() + ' : ' + currentURL)
-            except:
-                print('Error : ' + currentURL)
-                with open("retrievedDocs/afterCrawl/ERROR.txt", "a") as ErrorFile:
-                    ErrorFile.write(currentURL + '\n')
-
 
 def main():
     c = Crawler()
-    url = 'http://www.researchgate.net/researcher/8159937_Zoubin_Ghahramani'
-    c.crawl(url, 100)
+    url = START_PAGE
+    c.crawl(url, MIN_NUMBER_OF_DOCS)
 
 
 if __name__ == '__main__':

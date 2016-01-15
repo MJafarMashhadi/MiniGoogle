@@ -3,7 +3,7 @@ import json
 from timer import Timer
 
 import os
-from elastic.api import ElasticAPI
+from elastic.indexing_api import IndexingAPI
 from flask import Flask, render_template, redirect, url_for
 from flask import request
 
@@ -22,7 +22,7 @@ def search():
     if not query_string or len(query_string) == 0:
         return redirect(url_for('home'))
 
-    print ('Searching for', query_string)
+    print('Searching for', query_string)
     timer = Timer()
     timer.start()
     # TODO: Do stuff here
@@ -50,7 +50,7 @@ def index():
     timer = Timer()
     timer.start()
     retrieved_path = os.path.normpath(__file__ + '/../../retrievedDocs/afterCrawl')
-    api = ElasticAPI('http://localhost:9200/', retrieved_path)
+    api = IndexingAPI('http://localhost:9200/', retrieved_path)
     response = api.bulk_add_documents_in_directory(retrieved_path, 'articles', 'paper').json()
     success = not response['errors']
     num_docs = len(response['items'])
