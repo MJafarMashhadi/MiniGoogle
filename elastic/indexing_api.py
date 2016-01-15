@@ -4,7 +4,7 @@ import requests
 from util import read_file, list_files
 
 
-class ElasticAPI:
+class IndexingAPI:
 
     def __init__(self, base_url, base_folder):
         """
@@ -95,7 +95,7 @@ class ElasticAPI:
 
 
 def test():
-    api = ElasticAPI('http://localhost:9200', '../retrievedDocs/afterCrawl')
+    api = IndexingAPI('http://localhost:9200', '../retrievedDocs/afterCrawl')
     api.add_document_by_id('285458515', 'article', 'papers')
     api.bulk_add_documents_in_directory('../retrievedDocs/afterCrawl/', 'article', 'papers')
 
