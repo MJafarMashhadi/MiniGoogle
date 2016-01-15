@@ -1,14 +1,16 @@
 import json
 
+from timer import Timer
+
 from elastic.indexing_api import IndexingAPI
 from flask import Flask, render_template, redirect, url_for
 from flask import request
 from settings import DOCUMENTS_DIR, ELASTIC_URL, INDEX_NAME, DOCUMENT_TYPE
-from .timer import Timer
+from settings import PORT, BIND_IP, APP_NAME, DEBUG_MODE
 
 
-app = Flask('minigoogle')
-app.debug = True
+app = Flask(APP_NAME)
+app.debug = DEBUG_MODE
 
 
 @app.route('/')
@@ -67,4 +69,4 @@ def index():
 
 if __name__ == "__main__":
     print('starting server')
-    app.run()
+    app.run(host=BIND_IP, port=PORT)
