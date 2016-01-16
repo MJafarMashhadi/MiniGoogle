@@ -36,20 +36,27 @@ class SearchAPI:
 
         return '/'.join(url_parts)
 
-    def search(self, query, index=None, type=None, size=1000):
+    def search(self, query, index=None, doc_type=None, size=1000):
         """
         :param query: A dictionary of query in fields
         :param index: name of one index or list of index names
-        :param type: name of one doc type or list of doctypes
+        :param doc_type: name of one doc type or list of doctypes
         :param size: number of top docs returned. size of hits array in response
-        :return: { "total": 15, "hits": [{...}]}
+        :return: {took: 69, hits: { "total": 15, "hits": [{...}]} }
         """
-        base_url = self.get_search_url(index, type)
+        base_url = self.get_search_url(index, doc_type)
         query_string_items = []
-        for k,v in query.key():
+        if type(query) != dict:
+            query = {
+                'abstract': query
+            }
+        for k,v in query.items():
             query_string_items.append('{}:{}'.format(k,v))
 
         query_string = ','.join(query_string_items)
-        query_url = '{}?q={}&sort=pagerank:desc&size={}'.format(base_url, query_string, size)
-
-        return requests.get(query_url).json()['hits']
+        # TODO: uncomment after adding page rank
+        # query_url = '{}?q={}&sort=pagerank:desc&size={}'.format(base_url, query_string, size)
+        query_url = '{}?q={}&size={}'.format(base_url, query_string, size)
+        response_json = requests.get(query_url).json()
+        print(response_json)
+        return response_json
