@@ -32,13 +32,65 @@
         header {
             border-bottom: rgba(0, 0, 0, 0.22);
             background: #fafafa;
-            padding: 7px 5px;
+            padding: 11px 5px;
             margin-bottom: 10px;
+            margin-top: -5px;
         }
 
         header div {
             display: inline-block;
             margin: auto 5px;
+        }
+
+        .result-title {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .authors {
+            margin: 0;
+            padding: 0;
+        }
+
+        ol.authors {
+            color: rgba(0, 0, 0, 0.40);
+            display: inline-block;
+            list-style: none;
+        }
+
+        .authors li {
+            display: inline-block;
+            margin: 0 3px 0 0;
+            padding: 3px 5px 3px 5px;
+            border-radius: 5px;
+        }
+
+        .authors li:hover {
+            background: rgba(0, 0, 0, 0.10);
+        }
+
+        span.authors {
+            color: rgba(0, 0, 0, 0.50);
+        }
+
+        .citation {
+            color: rgba(0, 0, 0, 0.25);
+            font-size: 0.95em;
+        }
+
+        .results-table {
+            margin: 25px 0 0 0;
+            list-style: none;
+            padding: 0;
+        }
+
+        .results-table li {
+            padding: 8px;
+            margin-bottom: 15px;
+        }
+
+        .results-table li:hover {
+            background: rgba(0, 0, 0, 0.03);
         }
     </style>
 </head>
@@ -59,16 +111,27 @@
 </header>
 <div class="container-fluid">
     <div class="col-lg-10">
-        {{ results | length }} results in <strong>{{ duration }}</strong>.
-        <div class="container-fluid">
+        Found {{ total_results }} results in <strong>{{ duration }}</strong>.
+        <ol class="results-table">
             {% for result in results %}
-                <div class="row">
-                    <div class="col-lg-12">
-                        {{ result }}
-                    </div>
-                </div>
+                <li>
+                    <p>
+                        <a href="{{ result._source.page }}" class="result-title">{{ result._source.title }}</a>
+                        <span class="citation pull-right">Cited in {{ result._source.cited_in | length }} papers and references {{ result._source.refrences | length }}</span>
+                    </p>
+
+                    <p class="abstract text-muted">
+                        {{ result._source.abstract }}
+                    </p>
+                    <span class="authors">Authors:</span>
+                    <ol class="authors">
+                        {% for author in result._source.authors %}
+                            <li>{{ author }}</li>
+                        {% endfor %}
+                    </ol>
+                </li>
             {% endfor %}
-        </div>
+        </ol>
     </div>
     <div class="col-lg-2">
         {% include 'ads.html' %}
