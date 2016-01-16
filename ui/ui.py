@@ -3,6 +3,7 @@ import json
 from timer import Timer
 
 from elastic.indexing_api import IndexingAPI
+from elastic.search_api import SearchAPI
 from flask import Flask, render_template, redirect, url_for
 from flask import request
 from settings import DOCUMENTS_DIR, ELASTIC_URL, INDEX_NAME, DOCUMENT_TYPE
@@ -25,15 +26,17 @@ def search():
         return redirect(url_for('home'))
 
     print('Searching for', query_string)
-    timer = Timer()
-    timer.start()
-    # TODO: Do stuff here
-    timer.end()
-    return render_template('results.html',
-        query=query_string,
-        results=[],
-        duration=timer.get_time_taken_pretty()
-    )
+    api = SearchAPI(ELASTIC_URL)
+    results = api.search(query_string, INDEX_NAME, DOCUMENT_TYPE, 10)
+    if 'error' not in results:
+        return render_template('results.html',
+            query=query_string,
+            total_results=results['hits']['total'],
+            results=results['hits']['hits'],
+            duration='{} seconds'.format(results['took']/1000.0)
+        )
+    else:
+        return render_template('sorry.html', extra_data=json.dumps(results, indent=True))
 
 
 @app.route('/admin')
