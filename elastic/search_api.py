@@ -48,12 +48,13 @@ class SearchAPI:
         query_string_items = []
         if type(query) != dict:
             query = {
-                'abstract': query
+                'abstract': query,
+                'title': query,
             }
         for k,v in query.items():
             query_string_items.append('{}:{}'.format(k,v))
 
-        query_string = ','.join(query_string_items)
+        query_string = ' <OR> '.join(query_string_items)
         # TODO: uncomment after adding page rank
         # query_url = '{}?q={}&sort=pagerank:desc&size={}'.format(base_url, query_string, size)
         query_url = '{}?q={}&size={}'.format(base_url, query_string, size)
