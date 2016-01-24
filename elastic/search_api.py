@@ -44,6 +44,9 @@ class SearchAPI:
         :param size: number of top docs returned. size of hits array in response
         :return: {took: 69, hits: { "total": 15, "hits": [{...}]} }
         """
+
+        # TODO: use page rank
+
         base_url = self.get_search_url(index, doc_type)
         query_string_items = []
         if type(query) != dict:
@@ -55,7 +58,7 @@ class SearchAPI:
             query_string_items.append('{}:{}'.format(k,v))
 
         query_string = ' <OR> '.join(query_string_items)
-        query_url = '{}?q={}&sort=pageRank:desc&size={}'.format(base_url, query_string, size)
+        query_url = '{}?q={}&size={}'.format(base_url, query_string, size)
         response_json = requests.get(query_url).json()
         print(response_json)
         return response_json
