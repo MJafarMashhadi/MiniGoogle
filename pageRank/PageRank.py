@@ -1,5 +1,5 @@
 import os
-from settings import PAGERANKALFA, PAGERANKERROR, PAGERANKDESTINATIONDIRECTORY
+from settings import PAGERANK_ALFA, PAGERANK_ERROR, PAGERANK_DESTINATION_DIRECTORY
 
 __author__ = 'mohammad hosein'
 
@@ -36,7 +36,7 @@ class PageRank:
             p.append(pp)
 
         # calculate page rank
-        pr = self.pageRankMathCalculation(p,PAGERANKALFA,PAGERANKERROR)
+        pr = self.pageRankMathCalculation(p,PAGERANK_ALFA,PAGERANK_ERROR)
 
         print('start save files')
         # save docs
@@ -69,7 +69,8 @@ class PageRank:
             x = np.dot(x, p)
             if (self.calcError(pervx, x) < error):
                 break
-        print('step = '+ step.__str__())
+
+        print('end step = '+ step.__str__())
         return x
 
     def calcError(self, perv, new):
@@ -173,7 +174,7 @@ class PageRank:
 def main():
     print('page rank')
     c = PageRank()
-    c.pageRank(settings.PAGERANKRESOURCEDIRECTORY,PAGERANKDESTINATIONDIRECTORY)
+    c.pageRank(settings.PAGERANK_RESOURCE_DIRECTORY,PAGERANK_DESTINATION_DIRECTORY)
 
 
 if __name__ == '__main__':

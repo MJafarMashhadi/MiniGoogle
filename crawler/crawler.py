@@ -108,6 +108,7 @@ class Crawler:
         self.visitedTitles.add(parsedPage['title'])
         self.visitedURLs.add(parsedPage['page'])
         self.lockAdd.release()
+        #TODO : number of cited in and references
 
     def crawl(self, startingURL, n):
         os.makedirs(AFTER_CRAWL_BASE_DIR, exist_ok=True)
