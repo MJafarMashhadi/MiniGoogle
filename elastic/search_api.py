@@ -55,9 +55,7 @@ class SearchAPI:
             query_string_items.append('{}:{}'.format(k,v))
 
         query_string = ' <OR> '.join(query_string_items)
-        # TODO: uncomment after adding page rank
-        # query_url = '{}?q={}&sort=pagerank:desc&size={}'.format(base_url, query_string, size)
-        query_url = '{}?q={}&size={}'.format(base_url, query_string, size)
+        query_url = '{}?q={}&sort=pageRank:desc&size={}'.format(base_url, query_string, size)
         response_json = requests.get(query_url).json()
         print(response_json)
         return response_json
