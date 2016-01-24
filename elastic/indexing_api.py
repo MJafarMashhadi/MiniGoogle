@@ -90,6 +90,8 @@ class IndexingAPI:
             header = json.dumps({'index': {'_id': id}})
             request_data += [header, document]
 
+        request_data.append('\n')
+
         bulk_request = requests.post('/'.join([self.base_url, index_name, document_type, '_bulk']), data='\n'.join(request_data))
         return bulk_request
 
