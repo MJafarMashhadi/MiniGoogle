@@ -9,13 +9,13 @@ class Vector:
         self.dict = terms if terms else {}
 
     def size(self):
-        return sqrt(sum(map(lambda x: x*x, dict.values())))
+        return sqrt(sum(map(lambda x: x*x, self.dict.values())))
 
     def dotp(self, v):
         sum = 0
-        for t in dict.keys():
+        for t in self.dict.keys():
             if t in v.dict.keys() :
-                sum += dict[t] * v.dict[t]
+                sum += self.dict[t] * v.dict[t]
         return sum
 
     def sim(self, v):

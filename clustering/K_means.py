@@ -29,10 +29,11 @@ class K_means:
         self.centroidList = []
         visitedDoc = []
         while len(self.centroidList) < k:
-            r = random.randint(0, len(self.docVector))
+            r = random.choice(list(self.docVector.keys()))
             if r not in visitedDoc:
-                v = Vector()
-                v.dict = self.docVector[r].dict.copy()
+                visitedDoc.append(r)
+                v = Vector(self.docVector[r].dict.copy())
+                # v.dict = self.docVector[r].dict.copy()
                 self.centroidList.append(v)
 
     def nearestCentroid(self, docID):
@@ -52,10 +53,10 @@ class K_means:
             c = self.docCluster[d]
             numberOfDoc[c] += 1
             for t in self.docVector[d].dict.keys():
-                if t in self.docCluster[c].dict.keys():
-                    self.centroidList.dict[t] += self.docVector[d].dict[t]
+                if t in self.centroidList[c].dict.keys():
+                    self.centroidList[c].dict[t] += self.docVector[d].dict[t]
                 else:
-                    self.centroidList.dict[t] = self.docVector[d].dict[t]
+                    self.centroidList[c].dict[t] = self.docVector[d].dict[t]
 
         for c in range(0, len(self.centroidList)):
             for v in self.centroidList[c].dict.values():
@@ -82,7 +83,10 @@ class K_means:
                         m[c].append(self.I(t, c))
         result = []
         for d in m:
-            result.append(d.sort(reverse=True)[:k])
+            z = list(zip(d,terms))
+            z.sort(key = lambda x:x[0],reverse=True)
+            # d.sort(reverse=True)
+            result.append(list(map(lambda x: x[1], z[:k])))
         return result
 
 
@@ -105,18 +109,29 @@ class K_means:
         n_1 = n01 + n11
         n0_ = n00 + n01
         n_0 = n00 + n10
-        return n11 / n * log2(n * n11 / (n1_ * n_1)) + n01 / n * log2(n * n01 / (n0_ * n_1)) + n10 / n * log2(
-            n * n10 / (n1_ * n_0)) + n00 / n * log2(n * n00 / (n0_ * n_0))
+        # print('cluster : '+cluster.__str__())
+        # print('n00 = ',n00)
+        # print('n01 = ', n01)
+        # print('n10 = ',n10)
+        # print('n11 = ', n11)
+        a1 =  n11 / n * log2(n * n11 / (n1_ * n_1)) if n11 != 0 else 0
+        a2 = n01 / n * log2(n * n01 / (n0_ * n_1)) if n01 != 0 else 0
+        a3 = n10 / n * log2(n * n10 / (n1_ * n_0)) if n10 != 0 else 0
+        a4 = n00 / n * log2(n * n00 / (n0_ * n_0)) if n00 != 0 else 0
+        return a1 +a2  + a3 + a4
 
     def clusterDocs(self):
         api = TermVectorAPI(ELASTIC_URL)
-        for file in map(lambda x: os.path.join(CLUSTER_SOURCE_DIRECTORY,x),list_files(CLUSTER_SOURCE_DIRECTORY, '*.json')):
+        print('start read files')
+        for file in map(lambda x: os.path.join(CLUSTER_SOURCE_DIRECTORY,x),list_files(CLUSTER_SOURCE_DIRECTORY, '*2.json')):
             with open(file, 'r') as readFile:
                 doc = json.load(readFile)
             self.docsJson[doc['id']]= doc
             self.docVector[doc['id']] = Vector(api.get_term_vector(INDEX_NAME, DOCUMENT_TYPE, doc['id']))
-
+        print('read all files successfully')
+        print('start init centroid')
         self.initCentroid(CLUSTER_NUM)
+        print('end init centroid')
 
         while True:
             self.oldDocCluster = self.docCluster.copy()
@@ -124,26 +139,34 @@ class K_means:
             for docID in self.docsJson.keys():
                 self.docCluster[docID] = self.nearestCentroid(docID)
             self.updateCentroid()
+            print('one step clustring')
             if (self.terminateCondition()):
                 break
 
+        print('converge clustring')
         candids = self.findCandidateText(CLUSTER_CANDIDATE_TEXT_LEN)
+        print('calc candid')
         c = [[]] * len(self.centroidList)
         for d in self.docCluster.keys():
             c[self.docCluster[d]].append(d)
+        print('start save result')
+        os.makedirs(CLUSTER_DESTINATION_DIRECTORY, exist_ok=True)
+        os.makedirs(CLUSTER_CANDIDATE_TEXT_DIRECTORY, exist_ok=True)
         for i in range(len(self.centroidList)):
             res = {}
             res['id'] = i
             res['name'] = candids[i]
             res['pages'] = c[i]
             fileName = i.__str__()+'.json'
+            print(res)
             with open(os.path.join(CLUSTER_CANDIDATE_TEXT_DIRECTORY, fileName), 'w') as outfile:
-                json.dump(self.URLIDMap, outfile)
+                json.dump(res, outfile)
         for id in self.docsJson.keys():
             self.docsJson[id]['cluster'] = self.docCluster[id]
             file_name = '{}.json'.format(id)
             with open(os.path.join(CLUSTER_DESTINATION_DIRECTORY , file_name), 'w') as outfile:
                 json.dump(self.docsJson[id], outfile)
+        print('end save result')
 
 def main():
     c = K_means()
