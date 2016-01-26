@@ -45,8 +45,6 @@ class SearchAPI:
         :return: {took: 69, hits: { "total": 15, "hits": [{...}]} }
         """
 
-        # TODO: use page rank
-
         base_url = self.get_search_url(index, doc_type)
         query_string_items = []
         if type(query) != dict:
@@ -59,6 +57,16 @@ class SearchAPI:
 
         query_string = ' <OR> '.join(query_string_items)
         query_url = '{}?q={}&size={}'.format(base_url, query_string, size)
-        response_json = requests.get(query_url).json()
-        print(response_json)
+        alpha = 0.8
+        score_function = "(_score*{})+(_source.pageRank*100*{})".format(alpha, 1.0 - alpha)
+        response_json = requests.post(query_url, json={
+            "track_scores": True,
+            "sort": {
+                "_script": {
+                    "type": "number",
+                    "order": "desc",
+                    "script": {"inline": score_function}
+                }
+            }
+        }).json()
         return response_json
