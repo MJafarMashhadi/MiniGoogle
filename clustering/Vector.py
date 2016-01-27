@@ -21,16 +21,5 @@ class Vector:
     def sim(self, v):
        return 1.0*self.dotp(v)/(self.size()*v.size())
 
-    # def vec_sum(self ,vec_list):
-    #    vsum = [0 for x in range(len(vec_list[0]))]
-    #    for vec in vec_list:
-    #       vsum = [s+x for s,x in zip(vsum, vec)]
-    #    return vsum
-    #
-    # def vec_average(self,vec_list):
-    #    return list(map(lambda x: x/len(vec_list), vec_sum(vec_list)))
-    #
-    # def belongs_to_cluster(self , v, centeroids):
-    #    similarities = [sim(u, v) for u in centeroids]
-    #    print ('similarities for', v, '=', similarities)
-    #    return max(enumerate(similarities), key=itemgetter(1))[0]
+    def distance2(self,V):
+        pass
