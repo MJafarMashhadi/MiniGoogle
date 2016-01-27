@@ -1,3 +1,4 @@
+// Show/hide clusters
 $(function () {
     $('.ch-cluster').on('change', function (e) {
         var self = $(this);
@@ -18,6 +19,7 @@ $(function () {
     })
 });
 
+// Pagination
 $(function () {
     window.$results_page = 1;
     $('#load_more').on('click', function (e) {
@@ -35,4 +37,28 @@ $(function () {
             }
         })
     });
+});
+
+// Abstract text
+$(function () {
+    var showChar = 300;
+    $('p.abstract').each(function() {
+        var content = $(this).html();
+
+        if(content.length > showChar) {
+
+            var c = content.substr(0, showChar);
+            var h = content.substr(showChar-1, content.length - showChar);
+
+            var html = c + '<span class="see-more">... (click to see more)</span><span class="more">'+h+'</span>';
+
+            $(this).html(html);
+        }
+
+    }).on('click', function() {
+        $(this).children('.see-more').toggle();
+        $(this).children('.more').toggle();
+    });
+
+    $('p.abstract>span.more').hide();
 });
