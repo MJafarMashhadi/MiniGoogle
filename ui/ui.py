@@ -2,13 +2,14 @@ import json
 
 from timer import Timer
 
+import os
 from elastic.indexing_api import IndexingAPI
 from elastic.search_api import SearchAPI
 from flask import Flask, render_template, redirect, url_for
 from flask import request
+from settings import CLUSTER_CANDIDATE_TEXT_DIRECTORY
 from settings import DOCUMENTS_DIR, ELASTIC_URL, INDEX_NAME, DOCUMENT_TYPE
 from settings import PORT, BIND_IP, APP_NAME, DEBUG_MODE
-
 
 app = Flask(APP_NAME)
 app.debug = DEBUG_MODE
@@ -28,12 +29,19 @@ def search():
     print('Searching for', query_string)
     api = SearchAPI(ELASTIC_URL)
     results = api.search(query_string, INDEX_NAME, DOCUMENT_TYPE, 10)
+    # import random
     if 'error' not in results:
+        # for r in results['hits']['hits']:
+        #     r['_source']['cluster'] = random.randint(0,3)
+
+        clusters = set(map(lambda res: res['_source']['cluster'], results['hits']['hits']))
+
         return render_template('results.html',
             query=query_string,
             total_results=results['hits']['total'],
             results=results['hits']['hits'],
-            duration='{} seconds'.format(results['took']/1000.0)
+            duration='{} seconds'.format(results['took']/1000.0),
+            clusters=map(_get_cluster_data, clusters)
         )
     else:
         return render_template('sorry.html', extra_data=json.dumps(results, indent=True))
@@ -68,6 +76,12 @@ def index():
         success=success,
         numdocs=num_docs
     )
+
+
+def _get_cluster_data(cluster_id):
+    with open(os.path.join(CLUSTER_CANDIDATE_TEXT_DIRECTORY, str(cluster_id) + '.json'), 'r') as fp:
+        return json.load(fp)
+    # return {"id": cluster_id, "name": "cluster {}".format(cluster_id)}
 
 
 if __name__ == "__main__":
