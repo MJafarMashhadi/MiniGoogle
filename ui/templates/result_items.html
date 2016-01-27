@@ -1,0 +1,18 @@
+{% for result in results %}
+    <li class="cluster-{{ result._source.cluster }}">
+        <p>
+            <a href="{{ result._source.page }}" class="result-title">{{ result._source.title }}</a>
+            <span class="citation pull-right">Cited in {{ result._source.cited_in | length }} papers and references {{ result._source.refrences | length }}</span>
+        </p>
+
+        <p class="abstract text-muted">
+            {{ result._source.abstract }}
+        </p>
+        <span class="authors">Authors:</span>
+        <ol class="authors">
+            {% for author in result._source.authors %}
+                <li>{{ author }}</li>
+            {% endfor %}
+        </ol>
+    </li>
+{% endfor %}

@@ -85,3 +85,7 @@ span.authors {
 .results-table>li:hover {
     background: rgba(0, 0, 0, 0.03);
 }
+
+#load_more {
+    margin: 15px auto;
+}

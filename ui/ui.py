@@ -5,8 +5,7 @@ from timer import Timer
 import os
 from elastic.indexing_api import IndexingAPI
 from elastic.search_api import SearchAPI
-from flask import Flask, render_template, redirect, url_for
-from flask import request
+from flask import Flask, render_template, redirect, url_for, request
 from settings import CLUSTER_CANDIDATE_TEXT_DIRECTORY
 from settings import DOCUMENTS_DIR, ELASTIC_URL, INDEX_NAME, DOCUMENT_TYPE
 from settings import PORT, BIND_IP, APP_NAME, DEBUG_MODE
@@ -37,14 +36,30 @@ def search():
         clusters = set(map(lambda res: res['_source']['cluster'], results['hits']['hits']))
 
         return render_template('results.html',
-            query=query_string,
-            total_results=results['hits']['total'],
-            results=results['hits']['hits'],
-            duration='{} seconds'.format(results['took']/1000.0),
-            clusters=map(_get_cluster_data, clusters)
-        )
+                               query=query_string,
+                               total_results=results['hits']['total'],
+                               results=results['hits']['hits'],
+                               duration='{} seconds'.format(results['took']/1000.0),
+                               topics=map(_get_cluster_data, clusters)
+                               )
     else:
         return render_template('sorry.html', extra_data=json.dumps(results, indent=True))
+
+
+@app.route('/search/<page>')
+def search_page(page):
+    page = int(page) - 1
+    query_string = request.args.get('q')
+    if not query_string or len(query_string) == 0:
+        results = {}
+    else:
+        print('Searching for', query_string)
+        api = SearchAPI(ELASTIC_URL)
+        results = api.search(query_string, INDEX_NAME, DOCUMENT_TYPE, 10, 10*page)
+        if 'error' in results:
+            results = {}
+
+    return render_template('result_items.html', results=results['hits']['hits'])
 
 
 @app.route('/admin')

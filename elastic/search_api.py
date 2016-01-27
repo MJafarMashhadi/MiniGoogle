@@ -36,7 +36,7 @@ class SearchAPI:
 
         return '/'.join(url_parts)
 
-    def search(self, query, index=None, doc_type=None, size=1000):
+    def search(self, query, index=None, doc_type=None, size=1000, _from=0):
         """
         :param query: A dictionary of query in fields
         :param index: name of one index or list of index names
@@ -56,7 +56,7 @@ class SearchAPI:
             query_string_items.append('{}:{}'.format(k,v))
 
         query_string = ' <OR> '.join(query_string_items)
-        query_url = '{}?q={}&size={}'.format(base_url, query_string, size)
+        query_url = '{}?q={}&size={}&from={}'.format(base_url, query_string, size, _from)
         alpha = 0.8
         score_function = "(_score*{})+(_source.pageRank*100*{})".format(alpha, 1.0 - alpha)
         response_json = requests.post(query_url, json={

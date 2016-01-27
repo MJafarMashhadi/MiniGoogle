@@ -17,3 +17,22 @@ $(function () {
         self.children('.ch-cluster').trigger('click');
     })
 });
+
+$(function () {
+    window.$results_page = 1;
+    $('#load_more').on('click', function (e) {
+        var self = $(this);
+        self.addClass('disabled');
+        $.ajax({
+            url: '/search/' + (window.$results_page+1) + window.location.href.slice(window.location.href.indexOf('?')),
+            complete: function () {
+                self.removeClass('disabled');
+            },
+            success: function (ajax_results) {
+                $('.results-table').append(ajax_results);
+                window.$results_page++;
+                console.log('Current page = ' + window.$results_page);
+            }
+        })
+    });
+});
