@@ -1,15 +1,17 @@
-from operator import itemgetter
-import random
-from math import log2
 import json
+from math import log2
+
+import os
+import random
 from clustering.Vector import Vector
+from elastic.termvector_api import TermVectorAPI
+from operator import itemgetter
+from progress.spinner import PieSpinner
 from settings import CLUSTER_CANDIDATE_TEXT_LEN, \
     CLUSTER_CANDIDATE_TEXT_DIRECTORY, \
     CLUSTER_SOURCE_DIRECTORY, \
-    ELASTIC_URL, INDEX_NAME, DOCUMENT_TYPE, CLUSTER_DESTINATION_DIRECTORY, CLUSTER_NUM
-import os
+    ELASTIC_URL, INDEX_NAME, DOCUMENT_TYPE, CLUSTER_DESTINATION_DIRECTORY
 from util import list_files
-from elastic.termvector_api import TermVectorAPI
 
 __author__ = 'mohammad hosein'
 
@@ -25,6 +27,7 @@ class K_means:
     def __init__(self,k):
         # CLUSTER_NUM = k
         self._k = k
+        self.progress_bar = PieSpinner('Clustering')
 
     def initCentroid(self, k):
         self.centroidList = []
@@ -145,8 +148,10 @@ class K_means:
             for docID in self.docsJson.keys():
                 self.docCluster[docID] = self.nearestCentroid(docID)
             self.updateCentroid()
+            self.progress_bar.next()
             #print('one step clustring')
             if (self.terminateCondition()):
+                self.progress_bar.finish()
                 break
 
         #print('converge clustring')
@@ -165,7 +170,7 @@ class K_means:
             res['name'] = candids[i]
             res['pages'] = c[i]
             fileName = i.__str__()+'.json'
-            print('Cluster ',i,': ',' '.join(candids[i]),'\t number of doc : ',len(c[i]))
+            print('Cluster {}: {}\tnumber of docs: {}', i, ' '.join(candids[i]), len(c[i]))
             #print(res)
             with open(os.path.join(CLUSTER_CANDIDATE_TEXT_DIRECTORY, fileName), 'w') as outfile:
                 json.dump(res, outfile)
