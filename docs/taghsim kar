@@ -46,7 +46,7 @@ Karaye UI ina:
 progress bar e crawl                                            : mj        DONE !
 ezafe kardane darejeye graphe crawl be settings (in, out, joda) : mh        DONE !
 zhoubin e list she                                              : mh        DONE !
-elastic search configuration                                    : mj
+elastic search configuration                                    : mj        DONE !
 weight for search                                               : mj
 clustering progress bar                                         : mj        DONE !
 plot of k vs residual sum of squares                            : mj, mh
