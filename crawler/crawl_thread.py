@@ -1,11 +1,11 @@
 import threading
-import sys
 
 
 class CrawlThread(threading.Thread):
-    def __init__(self, c):
+    def __init__(self, c, progress_bar):
         threading.Thread.__init__(self)
         self.crawler = c
+        self.progress_bar = progress_bar
 
     def run(self):
         while self.crawler.numberOfVisitedPage < self.crawler.n and len(self.crawler.queue) > 0:
@@ -14,9 +14,11 @@ class CrawlThread(threading.Thread):
             self.crawler.lockQueue.release()
             try:
                 self.crawler.crawlPage(currentURL)
-                print(self.crawler.numberOfVisitedPage.__str__() + ' : ' + currentURL)
+                self.progress_bar.next()
+
+
             except:
-                print('Error : ' + currentURL)
-                print (sys.exc_info())
+                # print('Error : ' + currentURL)
+                # print (sys.exc_info())
                 with open("retrievedDocs/afterCrawl/ERROR.txt", "a") as ErrorFile:
                     ErrorFile.write(currentURL + '\n')

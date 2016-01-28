@@ -2,12 +2,11 @@ __author__ = 'mohammad hosein'
 
 import json
 import threading
+
 import os
 import re
-
 import requests
 from bs4 import BeautifulSoup
-
 from settings import NUMBER_OF_THREADS, START_PAGES, MIN_NUMBER_OF_DOCS, \
     MAP_FILE_NAME, ERRORS_FILE_NAME, AFTER_CRAWL_BASE_DIR, CITEDIN_NUMBER, REFRENCES_NUMBER
 from .crawl_thread import CrawlThread
@@ -147,7 +146,13 @@ class Crawler:
                 with open(os.path.join(AFTER_CRAWL_BASE_DIR, ERRORS_FILE_NAME), "a") as ErrorFile:
                     ErrorFile.write('cannot parse profile page ',sURL,'\n')
 
-        threads = [CrawlThread(self) for t in range(NUMBER_OF_THREADS)]
+        from progress.bar import IncrementalBar
+        progress_bar = IncrementalBar('Crawling', max=MIN_NUMBER_OF_DOCS, suffix='%(percent)d%% %(remaining)s remaining - eta %(eta_td)s')
+        progress_bar.next()
+        progress_bar.next()
+        progress_bar.next()
+        progress_bar.next()
+        threads = [CrawlThread(self, progress_bar) for t in range(NUMBER_OF_THREADS)]
 
         for t in threads:
             t.start()
@@ -157,7 +162,8 @@ class Crawler:
 
         with open(os.path.join(AFTER_CRAWL_BASE_DIR, MAP_FILE_NAME), 'w') as outfile:
             json.dump(self.URLIDMap, outfile)
-        print('End Crawling!')
+
+        progress_bar.finish()
 
     def parseProfilePage(self, url):  # return top 10 article url
         r = requests.get(url)
