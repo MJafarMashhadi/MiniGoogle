@@ -1,17 +1,15 @@
-from idlelib.idle_test.test_io import S
-import threading
-
 __author__ = 'mohammad hosein'
 
 import json
 import threading
-
 import os
 import re
+
 import requests
 from bs4 import BeautifulSoup
-from settings import NUMBER_OF_THREADS, START_PAGE, MIN_NUMBER_OF_DOCS, \
-    MAP_FILE_NAME, ERRORS_FILE_NAME, AFTER_CRAWL_BASE_DIR
+
+from settings import NUMBER_OF_THREADS, START_PAGES, MIN_NUMBER_OF_DOCS, \
+    MAP_FILE_NAME, ERRORS_FILE_NAME, AFTER_CRAWL_BASE_DIR, CITEDIN_NUMBER, REFRENCES_NUMBER
 from .crawl_thread import CrawlThread
 
 
@@ -57,7 +55,7 @@ class Crawler:
         citedinIDs = []
         c=0
         for citation in jsonObject['result']['data']['citationItems']:
-            if c < 10 :
+            if c < CITEDIN_NUMBER :
                 c+=1
                 citedinURLs.append(self.baseURL + citation['data']['url'])
             citedinIDs.append(citation['data']['publicationUid'])
@@ -70,7 +68,7 @@ class Crawler:
         refrenceIDs = []
         c = 0
         for refrence in jsonObject['result']['data']['citationItems']:
-            if c <10 :
+            if c < REFRENCES_NUMBER :
                 refrenceURLs.append(self.baseURL + refrence['data']['url'])
                 c +=1
             refrenceIDs.append(refrence['data']['publicationUid'])
@@ -138,15 +136,16 @@ class Crawler:
 
     def crawl(self):
         n = MIN_NUMBER_OF_DOCS
-        startingURL = START_PAGE
+        startingURL = START_PAGES
         os.makedirs(AFTER_CRAWL_BASE_DIR, exist_ok=True)
         self.n = n
-        try:
-            self.queue.extend(self.parseProfilePage(startingURL))
-        except:
-            print('cannot parse profile page')
-            with open(os.path.join(AFTER_CRAWL_BASE_DIR, ERRORS_FILE_NAME), "a") as ErrorFile:
-                ErrorFile.write('cannot parse profile page\n')
+        for sURL in startingURL:
+            try:
+                self.queue.extend(self.parseProfilePage(sURL))
+            except:
+                print('cannot parse profile page')
+                with open(os.path.join(AFTER_CRAWL_BASE_DIR, ERRORS_FILE_NAME), "a") as ErrorFile:
+                    ErrorFile.write('cannot parse profile page ',sURL,'\n')
 
         threads = [CrawlThread(self) for t in range(NUMBER_OF_THREADS)]
 
