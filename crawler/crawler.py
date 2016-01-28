@@ -148,10 +148,6 @@ class Crawler:
 
         from progress.bar import IncrementalBar
         progress_bar = IncrementalBar('Crawling', max=MIN_NUMBER_OF_DOCS, suffix='%(percent)d%% %(remaining)s remaining - eta %(eta_td)s')
-        progress_bar.next()
-        progress_bar.next()
-        progress_bar.next()
-        progress_bar.next()
         threads = [CrawlThread(self, progress_bar) for t in range(NUMBER_OF_THREADS)]
 
         for t in threads:
