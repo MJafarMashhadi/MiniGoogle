@@ -34,10 +34,10 @@ class AuthorCrawler:
                     self.queueProfileURL.extend(filter(lambda x: x not in self.visitedProfileURL and x not in self.queueProfileURL,self.getAuthorFromArticle(self.queueArticleURL.pop(0))))
                 except:
                     pass
-            # try:
-            self.crawlProfile(self.queueProfileURL.pop(0))
-            # except:
-            #     pass
+            try:
+                self.crawlProfile(self.queueProfileURL.pop(0))
+            except:
+                pass
         print('finish')
 
     def getAuthorFromArticle(self, url):
