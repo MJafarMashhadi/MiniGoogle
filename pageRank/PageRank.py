@@ -9,25 +9,27 @@ import numpy as np
 import settings
 
 from util import list_files
-
+from progress.spinner import MoonSpinner
 
 class PageRank:
+
     def __init__(self):
-        pass
+        self.progress_bar = MoonSpinner('Calculating page ranks')
 
     def pageRank(self):
         sourceDirectory =settings.PAGERANK_RESOURCE_DIRECTORY
         destDirectory = PAGERANK_DESTINATION_DIRECTORY
         docs = []
         id2index = {}
-        print('start read files')
+        # print('start read files')
         # read files
         for file in map(lambda x: os.path.join(sourceDirectory,x),list_files(sourceDirectory, '*.json')):
             with open(file, 'r') as readFile:
                 doc = json.load(readFile)
             id2index[doc['id']] = len(docs)
+            self.progress_bar.next()
             docs.append(doc)
-        print('statrt calc page rank')
+        # print('start calc page rank')
         # create links matrix
         n = len(docs)
         p = []
@@ -40,7 +42,7 @@ class PageRank:
         # calculate page rank
         pr = self.pageRankMathCalculation(p,PAGERANK_ALFA,PAGERANK_ERROR)
 
-        print('start save files')
+        # print('start save files')
         # save docs
         os.makedirs(destDirectory, exist_ok=True)
         for doc,pagerank in zip(docs,pr):
@@ -48,7 +50,7 @@ class PageRank:
             file_name = '{}.json'.format(doc['id'])
             with open(os.path.join(destDirectory , file_name), 'w') as outfile:
                 json.dump(doc, outfile)
-        print('end page rank')
+        # print('end page rank')
 
     def pageRankMathCalculation(self, p, alfa, error):
         n = len(p)
@@ -69,10 +71,12 @@ class PageRank:
             step += 1
             pervx = x
             x = np.dot(x, p)
-            if (self.calcError(pervx, x) < error):
+            self.progress_bar.next()
+            if self.calcError(pervx, x) < error:
+                self.progress_bar.finish()
                 break
 
-        print('end step = '+ step.__str__())
+        # print('end step = '+ step.__str__())
         return x
 
     def calcError(self, perv, new):
@@ -96,17 +100,6 @@ class PageRank:
         # a = [[1, 0], [0, 1]]
         # >>> b = [[4, 1], [2, 2]]
         # >>> np.dot(a, b)
-        #
-        #
-        #
-        #
-        #
-        #
-        #
-        #
-        #
-        #
-        #
         #
         # import numpy as np
         # from scipy.sparse import csc_matrix
@@ -174,7 +167,7 @@ class PageRank:
 
 
 def main():
-    print('page rank')
+    # print('page rank')
     c = PageRank()
     c.pageRank()
 
