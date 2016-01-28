@@ -37,3 +37,20 @@ MJ:
  - UI baraye clustring e nevisande ha
  - Clustering e nevisande ha
  - teste UI e cluster e maghale ha
+
+_________________________________________________________________________________________________________________________________________
+
+
+Karaye UI ina:
+
+progress bar e crawl                                            : mj
+ezafe kardane darejeye graphe crawl be settings (in, out, joda) : mh
+zhoubin e list she                                              : mh
+elastic search configuration                                    : mj
+weight for search                                               : mj
+clustering progress bar                                         : mj
+plot of k vs residual sum of squares                            : mj, mh
+neshoon dadane tedade doc haye too cluster                      : mh
+progressbar for pagerank                                        : mj
+clustere adama                                                  : mj, mh
+jadvale k-means                                                 : mh
