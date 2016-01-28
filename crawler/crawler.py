@@ -1,3 +1,4 @@
+from idlelib.idle_test.test_io import S
 import threading
 
 __author__ = 'mohammad hosein'
@@ -26,16 +27,22 @@ class Crawler:
         self.baseURL = 'https://www.researchgate.net/'
 
     def parseArticlePage(self, url):
-        id = self.getIDFromURL(url)
+        id = self.getArticleIDFromURL(url)
 
         r = requests.get(url)
         s = BeautifulSoup(r.text, 'html.parser')
+
+        # type_ = s.find('div',class_='type-label')
+        # t= type_.text.replace(' ', '')
+        # if t != 'Article':
+        #     raise Exception()
+
         title = s.find('h1', class_='pub-title')
         title = title.text
         authors = s.findAll('a', class_='display-name')
         authorsList = []
         for author in authors:
-            authorsList += [author.text]
+            authorsList.append((self.getAuthorIDFromURL(author['href']) ,author.text,self.baseURL +author['href']))
         abstract = s.find('div', class_='pub-abstract').div.div.text
 
         headers = {
@@ -43,23 +50,31 @@ class Crawler:
             'x-requested-with': 'XMLHttpRequest',
         }
 
-        js_url_citedin = 'https://www.researchgate.net/publicliterature.PublicationIncomingCitationsList.html?publicationUid=' + id + '&useUpdatedLayoutForPublicationItems=false&loadAuthorImageLinks=false&getCommentCount=false&usePlainButton=false&useEnrichedContext=false&showAbstract=false&showType=false&showDownloadButton=false&showOpenReviewButton=false&showPublicationPreview=false&swapJournalAndAuthorPositions=false&showContexts=false&limit=10&loadMoreCount=1'
+        js_url_citedin = 'https://www.researchgate.net/publicliterature.PublicationIncomingCitationsList.html?publicationUid=' + id + '&useUpdatedLayoutForPublicationItems=false&loadAuthorImageLinks=false&getCommentCount=false&usePlainButton=false&useEnrichedContext=false&showAbstract=false&showType=false&showDownloadButton=false&showOpenReviewButton=false&showPublicationPreview=false&swapJournalAndAuthorPositions=false&showContexts=false&limit=10000'
         r2 = requests.get(js_url_citedin, headers=headers)
         jsonObject = json.loads(r2.text)
         citedinURLs = []
         citedinIDs = []
+        c=0
         for citation in jsonObject['result']['data']['citationItems']:
-            citedinURLs.append(self.baseURL + citation['data']['url'])
+            if c < 10 :
+                c+=1
+                citedinURLs.append(self.baseURL + citation['data']['url'])
             citedinIDs.append(citation['data']['publicationUid'])
+        citedinURLs = citedinURLs[:10]
 
-        js_url_refrence = 'https://www.researchgate.net/publicliterature.PublicationCitationsList.html?publicationUid=' + id + '&useUpdatedLayoutForPublicationItems=false&loadAuthorImageLinks=false&getCommentCount=false&usePlainButton=false&useEnrichedContext=false&showAbstract=false&showType=false&showDownloadButton=false&showOpenReviewButton=false&showPublicationPreview=false&swapJournalAndAuthorPositions=false&showContexts=false&limit=10&loadMoreCount=1'
+        js_url_refrence = 'https://www.researchgate.net/publicliterature.PublicationCitationsList.html?publicationUid=' + id + '&useUpdatedLayoutForPublicationItems=false&loadAuthorImageLinks=false&getCommentCount=false&usePlainButton=false&useEnrichedContext=false&showAbstract=false&showType=false&showDownloadButton=false&showOpenReviewButton=false&showPublicationPreview=false&swapJournalAndAuthorPositions=false&showContexts=false&limit=10000'
         r2 = requests.get(js_url_refrence, headers=headers)
         jsonObject = json.loads(r2.text)
         refrenceURLs = []
         refrenceIDs = []
+        c = 0
         for refrence in jsonObject['result']['data']['citationItems']:
-            refrenceURLs.append(self.baseURL + refrence['data']['url'])
+            if c <10 :
+                refrenceURLs.append(self.baseURL + refrence['data']['url'])
+                c +=1
             refrenceIDs.append(refrence['data']['publicationUid'])
+        # refrenceURLs = refrenceURLs[:10]
 
         result = {}
         result['id'] = id
@@ -72,8 +87,17 @@ class Crawler:
         result['newURLs'] = citedinURLs + refrenceURLs
         return result
 
-    def getIDFromURL(self, url):
+    def getArticleIDFromURL(self, url):
         return re.findall(r'publication/(?P<id>\d+)_', url)[0]
+    def getAuthorIDFromURL(self,url):
+        try:
+            return re.findall(r'researcher/(?P<id>\d+)_', url)[0]
+        except:
+            try:
+                return re.findall(r'profile/(?P<id>\d+)_', url)[0]
+            except:
+                return '0'
+
 
     def chceckDupURL(self, url):
         return url in self.visitedURLs
@@ -93,6 +117,8 @@ class Crawler:
             return
 
         parsedPage = self.parseArticlePage(url)
+        if parsedPage is None:
+            return
 
         if self.checkDupTitel(parsedPage['title']):
             return
@@ -110,7 +136,9 @@ class Crawler:
         self.lockAdd.release()
         #TODO : number of cited in and references
 
-    def crawl(self, startingURL, n):
+    def crawl(self):
+        n = MIN_NUMBER_OF_DOCS
+        startingURL = START_PAGE
         os.makedirs(AFTER_CRAWL_BASE_DIR, exist_ok=True)
         self.n = n
         try:
@@ -130,6 +158,7 @@ class Crawler:
 
         with open(os.path.join(AFTER_CRAWL_BASE_DIR, MAP_FILE_NAME), 'w') as outfile:
             json.dump(self.URLIDMap, outfile)
+        print('End Crawling!')
 
     def parseProfilePage(self, url):  # return top 10 article url
         r = requests.get(url)
@@ -144,8 +173,7 @@ class Crawler:
 
 def main():
     c = Crawler()
-    url = START_PAGE
-    c.crawl(url, MIN_NUMBER_OF_DOCS)
+    c.crawl()
 
 
 if __name__ == '__main__':

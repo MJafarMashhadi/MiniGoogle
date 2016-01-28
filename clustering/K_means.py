@@ -62,6 +62,11 @@ class K_means:
             for v in self.centroidList[c].dict.values():
                 v /= numberOfDoc[c]
 
+    def J(self):
+        j = 0
+        for d in self.docCluster.keys():
+            j += self.docVector[d].distance2(self.centroidList[self.docCluster[d]])
+        return j
 
     def terminateCondition(self):
         if len(self.oldDocCluster) == 0:
@@ -74,7 +79,7 @@ class K_means:
 
     def findCandidateText(self, k):
         terms = []
-        m = [[]] * len(self.centroidList)
+        m = [[] for x in range(len(self.centroidList))]
         for d in self.docVector.values():
             for t in d.dict.keys():
                 if t not in terms:
@@ -144,9 +149,10 @@ class K_means:
                 break
 
         print('converge clustring')
+        print('J = ',self.J())
         candids = self.findCandidateText(CLUSTER_CANDIDATE_TEXT_LEN)
         print('calc candid')
-        c = [[]] * len(self.centroidList)
+        c = [[] for x in range(len(self.centroidList))]
         for d in self.docCluster.keys():
             c[self.docCluster[d]].append(d)
         print('start save result')

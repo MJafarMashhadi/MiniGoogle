@@ -1,4 +1,5 @@
 import threading
+import sys
 
 
 class CrawlThread(threading.Thread):
@@ -16,5 +17,6 @@ class CrawlThread(threading.Thread):
                 print(self.crawler.numberOfVisitedPage.__str__() + ' : ' + currentURL)
             except:
                 print('Error : ' + currentURL)
+                print (sys.exc_info())
                 with open("retrievedDocs/afterCrawl/ERROR.txt", "a") as ErrorFile:
                     ErrorFile.write(currentURL + '\n')
