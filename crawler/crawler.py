@@ -2,11 +2,12 @@ __author__ = 'mohammad hosein'
 
 import json
 import threading
-
 import os
 import re
+
 import requests
 from bs4 import BeautifulSoup
+
 from settings import NUMBER_OF_THREADS, START_PAGES, MIN_NUMBER_OF_DOCS, \
     MAP_FILE_NAME, ERRORS_FILE_NAME, AFTER_CRAWL_BASE_DIR, CITEDIN_NUMBER, REFRENCES_NUMBER
 from .crawl_thread import CrawlThread
@@ -86,6 +87,7 @@ class Crawler:
 
     def getArticleIDFromURL(self, url):
         return re.findall(r'publication/(?P<id>\d+)_', url)[0]
+
     def getAuthorIDFromURL(self,url):
         try:
             return re.findall(r'researcher/(?P<id>\d+)_', url)[0]
@@ -94,7 +96,6 @@ class Crawler:
                 return re.findall(r'profile/(?P<id>\d+)_', url)[0]
             except:
                 return '0'
-
 
     def chceckDupURL(self, url):
         return url in self.visitedURLs

@@ -7,11 +7,13 @@ RETRIEVED_BASE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'r
 NUMBER_OF_THREADS = 64
 START_PAGES = ['http://www.researchgate.net/researcher/8159937_Zoubin_Ghahramani']
 MIN_NUMBER_OF_DOCS = 1000
+MIN_NUMBER_OF_PROFILE = 100
 AFTER_CRAWL_BASE_DIR = os.path.join(RETRIEVED_BASE_DIR, 'afterCrawl')
 MAP_FILE_NAME = 'Map.txt'
 ERRORS_FILE_NAME = 'ERROR.txt'
 REFRENCES_NUMBER = 10
 CITEDIN_NUMBER = 10
+AFTER_CRAWL_AUTHOR_DIR = os.path.join(RETRIEVED_BASE_DIR, 'afterCrawlAuthor')
 
 # Page Rank settings
 PAGERANK_RESOURCE_DIRECTORY = AFTER_CRAWL_BASE_DIR

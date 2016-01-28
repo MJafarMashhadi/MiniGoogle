@@ -1,17 +1,19 @@
 import json
 from math import log2
-
 import os
 import random
+from operator import itemgetter
+
+from progress.spinner import PieSpinner
+
 from clustering.Vector import Vector
 from elastic.termvector_api import TermVectorAPI
-from operator import itemgetter
-from progress.spinner import PieSpinner
 from settings import CLUSTER_CANDIDATE_TEXT_LEN, \
     CLUSTER_CANDIDATE_TEXT_DIRECTORY, \
     CLUSTER_SOURCE_DIRECTORY, \
-    ELASTIC_URL, INDEX_NAME, DOCUMENT_TYPE, CLUSTER_DESTINATION_DIRECTORY
+    ELASTIC_URL, INDEX_NAME, DOCUMENT_TYPE, CLUSTER_DESTINATION_DIRECTORY, CLUSTER_NUM
 from util import list_files
+
 
 __author__ = 'mohammad hosein'
 
@@ -22,11 +24,9 @@ class K_means:
     oldDocCluster = {}
     docVector = {}
     docsJson={}
-    _k =5
 
-    def __init__(self,k):
+    def __init__(self):
         # CLUSTER_NUM = k
-        self._k = k
         self.progress_bar = PieSpinner('Clustering')
 
     def initCentroid(self, k):
@@ -139,7 +139,7 @@ class K_means:
             self.docVector[doc['id']] = Vector(api.get_term_vector(INDEX_NAME, DOCUMENT_TYPE, doc['id']))
         #print('read all files successfully')
         #print('start init centroid')
-        self.initCentroid(self._k)
+        self.initCentroid(CLUSTER_NUM)
         #print('end init centroid')
 
         while True:
@@ -155,7 +155,7 @@ class K_means:
                 break
 
         #print('converge clustring')
-        print('K = ',self._k,' J = ',self.J())
+        print('K = ',CLUSTER_NUM,' J = ',self.J())
         candids = self.findCandidateText(CLUSTER_CANDIDATE_TEXT_LEN)
         #print('calc candid')
         c = [[] for x in range(len(self.centroidList))]
