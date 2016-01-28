@@ -12,11 +12,7 @@ class Vector:
         return sqrt(sum(map(lambda x: x*x, self.dict.values())))
 
     def dotp(self, v):
-        sum = 0
-        for t in self.dict.keys():
-            if t in v.dict.keys() :
-                sum += self.dict[t] * v.dict[t]
-        return sum
+        return sum((self.dict[t] * v.dict[t] for t in self.dict.keys() & v.dict.keys()))
 
     def sim(self, v):
        return 1.0*self.dotp(v)/(self.size()*v.size())
