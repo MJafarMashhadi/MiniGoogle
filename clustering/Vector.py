@@ -17,5 +17,16 @@ class Vector:
     def sim(self, v):
        return 1.0*self.dotp(v)/(self.size()*v.size())
 
-    def distance2(self,V):
-        pass
+    def distance2(self,v):
+        res = 0
+        for t in self.dict.keys():
+            if t in v.dict.keys():
+                res += (self.dict[t]-v.dict[t])**2
+            else:
+                res += self.dict[t]**2
+
+        for t in v.dict.keys():
+            if t not in self.dict.keys():
+                res += v.dict[t]**2
+        return res
+

@@ -20,10 +20,11 @@ class K_means:
     oldDocCluster = {}
     docVector = {}
     docsJson={}
+    _k =5
 
-
-    def __init__(slef):
-        pass
+    def __init__(self,k):
+        # CLUSTER_NUM = k
+        self._k = k
 
     def initCentroid(self, k):
         self.centroidList = []
@@ -114,11 +115,11 @@ class K_means:
         n_1 = n01 + n11
         n0_ = n00 + n01
         n_0 = n00 + n10
-        # print('cluster : '+cluster.__str__())
-        # print('n00 = ',n00)
-        # print('n01 = ', n01)
-        # print('n10 = ',n10)
-        # print('n11 = ', n11)
+        # #print('cluster : '+cluster.__str__())
+        # #print('n00 = ',n00)
+        # #print('n01 = ', n01)
+        # #print('n10 = ',n10)
+        # #print('n11 = ', n11)
         a1 =  n11 / n * log2(n * n11 / (n1_ * n_1)) if n11 != 0 else 0
         a2 = n01 / n * log2(n * n01 / (n0_ * n_1)) if n01 != 0 else 0
         a3 = n10 / n * log2(n * n10 / (n1_ * n_0)) if n10 != 0 else 0
@@ -127,16 +128,16 @@ class K_means:
 
     def clusterDocs(self):
         api = TermVectorAPI(ELASTIC_URL)
-        print('start read files')
-        for file in map(lambda x: os.path.join(CLUSTER_SOURCE_DIRECTORY,x),list_files(CLUSTER_SOURCE_DIRECTORY, '*2.json')):
+        #print('start read files')
+        for file in map(lambda x: os.path.join(CLUSTER_SOURCE_DIRECTORY,x),list_files(CLUSTER_SOURCE_DIRECTORY, '*.json')):
             with open(file, 'r') as readFile:
                 doc = json.load(readFile)
             self.docsJson[doc['id']]= doc
             self.docVector[doc['id']] = Vector(api.get_term_vector(INDEX_NAME, DOCUMENT_TYPE, doc['id']))
-        print('read all files successfully')
-        print('start init centroid')
-        self.initCentroid(CLUSTER_NUM)
-        print('end init centroid')
+        #print('read all files successfully')
+        #print('start init centroid')
+        self.initCentroid(self._k)
+        #print('end init centroid')
 
         while True:
             self.oldDocCluster = self.docCluster.copy()
@@ -144,18 +145,18 @@ class K_means:
             for docID in self.docsJson.keys():
                 self.docCluster[docID] = self.nearestCentroid(docID)
             self.updateCentroid()
-            print('one step clustring')
+            #print('one step clustring')
             if (self.terminateCondition()):
                 break
 
-        print('converge clustring')
-        print('J = ',self.J())
+        #print('converge clustring')
+        print('K = ',self._k,' J = ',self.J())
         candids = self.findCandidateText(CLUSTER_CANDIDATE_TEXT_LEN)
-        print('calc candid')
+        #print('calc candid')
         c = [[] for x in range(len(self.centroidList))]
         for d in self.docCluster.keys():
             c[self.docCluster[d]].append(d)
-        print('start save result')
+        #print('start save result')
         os.makedirs(CLUSTER_DESTINATION_DIRECTORY, exist_ok=True)
         os.makedirs(CLUSTER_CANDIDATE_TEXT_DIRECTORY, exist_ok=True)
         for i in range(len(self.centroidList)):
@@ -164,7 +165,8 @@ class K_means:
             res['name'] = candids[i]
             res['pages'] = c[i]
             fileName = i.__str__()+'.json'
-            print(res)
+            print('Cluster ',i,': ',' '.join(candids[i]),'\t number of doc : ',len(c[i]))
+            #print(res)
             with open(os.path.join(CLUSTER_CANDIDATE_TEXT_DIRECTORY, fileName), 'w') as outfile:
                 json.dump(res, outfile)
         for id in self.docsJson.keys():
@@ -172,7 +174,7 @@ class K_means:
             file_name = '{}.json'.format(id)
             with open(os.path.join(CLUSTER_DESTINATION_DIRECTORY , file_name), 'w') as outfile:
                 json.dump(self.docsJson[id], outfile)
-        print('end save result')
+        #print('end save result')
 
 def main():
     c = K_means()

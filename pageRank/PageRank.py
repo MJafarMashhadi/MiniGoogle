@@ -15,7 +15,9 @@ class PageRank:
     def __init__(self):
         pass
 
-    def pageRank(self, sourceDirectory, destDirectory):
+    def pageRank(self):
+        sourceDirectory =settings.PAGERANK_RESOURCE_DIRECTORY
+        destDirectory = PAGERANK_DESTINATION_DIRECTORY
         docs = []
         id2index = {}
         print('start read files')
@@ -174,7 +176,7 @@ class PageRank:
 def main():
     print('page rank')
     c = PageRank()
-    c.pageRank(settings.PAGERANK_RESOURCE_DIRECTORY,PAGERANK_DESTINATION_DIRECTORY)
+    c.pageRank()
 
 
 if __name__ == '__main__':

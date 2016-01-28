@@ -44,13 +44,13 @@ ________________________________________________________________________________
 Karaye UI ina:
 
 progress bar e crawl                                            : mj
-ezafe kardane darejeye graphe crawl be settings (in, out, joda) : mh
-zhoubin e list she                                              : mh
+ezafe kardane darejeye graphe crawl be settings (in, out, joda) : mh        DONE !
+zhoubin e list she                                              : mh        DONE !
 elastic search configuration                                    : mj
 weight for search                                               : mj
 clustering progress bar                                         : mj
 plot of k vs residual sum of squares                            : mj, mh
-neshoon dadane tedade doc haye too cluster                      : mh
+neshoon dadane tedade doc haye too cluster                      : mh        DONE !
 progressbar for pagerank                                        : mj
 clustere adama                                                  : mj, mh
-jadvale k-means                                                 : mh
+jadvale k-means                                                 : mh        DONE !
