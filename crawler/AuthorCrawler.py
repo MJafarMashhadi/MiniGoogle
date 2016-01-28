@@ -89,4 +89,10 @@ class AuthorCrawler:
         for article in articles:
             result.append((self.baseURL + article['href'], self.getArticleIDFromURL(article['href'])))
         return result
+def main():
+    c = AuthorCrawler()
+    c.crawl()
 
+
+if __name__ == '__main__':
+    main()
