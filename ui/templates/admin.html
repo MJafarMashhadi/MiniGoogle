@@ -14,8 +14,11 @@
         <div class="panel-body">
             <div class="container">
                 <ul class="nav nav-pills">
+                    <li><a href="{{ url_for('index') }}">Add crude crawled docs to index</a></li>
                     <li><a href="{{ url_for('page_rank') }}">Calculate page ranks</a></li>
-                    <li><a href="{{ url_for('index') }}">Add docs to index</a></li>
+                    <li><a href="{{ url_for('index_page_rank') }}">Add page ranked docs to index</a></li>
+                    <li><a href="{{ url_for('cluster_docs') }}">Cluster documents</a></li>
+                    <li><a href="{{ url_for('index_cluster') }}">Add clustered docs to index</a></li>
                 </ul>
             </div>
         </div>

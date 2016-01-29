@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Calculating page ranks</title>
+    {% include 'header.html' %}
+    <style>
+        header {
+            border-bottom: rgba(0, 0, 0, 0.22);
+            background: #fafafa;
+            padding: 7px 5px;
+            margin-bottom: 10px;
+        }
+
+        header div {
+            display: inline-block;
+            margin: auto 5px;
+        }
+
+        pre {
+            max-height: 440px;
+            overflow-y: scroll;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <div class="logo">
+        <h3 style="line-height: 1em; margin: 0">Google<sub>mini</sub></h3>
+    </div>
+
+    <div class="">
+        <p>
+            Calculating page ranks
+        </p>
+    </div>
+</header>
+<div class="container-fluid">
+    <div class="col-lg-10">
+        <p class="alert alert-success">
+            Calculated page ranks :-)
+        </p>
+        <div class="panel panel-default">
+            <div class="panel-footer">
+                <a href="{{ url_for('admin') }}">Back to admin</a>
+            </div>
+        </div>
+
+    </div>
+    <div class="col-lg-2">
+        {% include 'ads.html' %}
+    </div>
+</div>
+</body>
+</html>

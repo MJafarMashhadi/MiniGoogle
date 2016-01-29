@@ -9,16 +9,12 @@ from elastic.search_api import SearchAPI
 from flask import Flask, render_template, redirect, url_for, request
 from settings import AUTHOR_CLUSTER_SOURCE_DIRECTORY, AUTHOR_CLUSTER_FILE
 from settings import CLUSTER_CANDIDATE_TEXT_DIRECTORY
-from settings import DOCUMENTS_DIR, ELASTIC_URL, INDEX_NAME, DOCUMENT_TYPE
+from settings import ELASTIC_URL, INDEX_NAME, DOCUMENT_TYPE, AFTER_CRAWL_BASE_DIR, PAGERANK_DESTINATION_DIRECTORY, CLUSTER_DESTINATION_DIRECTORY
 from settings import PORT, BIND_IP, APP_NAME, DEBUG_MODE
 from util import list_files
 
 app = Flask(APP_NAME)
 app.debug = DEBUG_MODE
-
-
-with open(AUTHOR_CLUSTER_FILE) as fo:
-    author_clusters = json.load(fo)
 
 
 @app.route('/')
@@ -76,8 +72,34 @@ def admin():
 
 @app.route('/admin/pagerank')
 def page_rank():
+    timer = Timer()
+    timer.start()
 
-    pass
+    from pageRank.PageRank import PageRank
+    c = PageRank()
+    c.pageRank()
+
+    timer.end()
+
+    return render_template('pagerank_result.html',
+        duration=timer.get_time_taken_pretty()
+    )
+
+
+@app.route('/admin/cluster')
+def cluster_docs():
+    timer = Timer()
+    timer.start()
+    from clustering.K_means import K_means
+    c = K_means()
+    c.clusterDocs()
+    timer.end()
+
+    return render_template('clustering_result.html',
+        duration=timer.get_time_taken_pretty(),
+        numclusters=len(c.centroidList)
+    )
+
 
 @app.route('/admin/author_cluster')
 def author_cluster_admin():
@@ -109,7 +131,6 @@ def author_cluster_admin():
 
     with open(AUTHOR_CLUSTER_FILE, 'w') as fp:
         json.dump(cluster_dict, fp)
-        author_clusters = cluster_dict
 
     timer.end()
 
@@ -121,11 +142,10 @@ def author_cluster_admin():
     )
 
 
-@app.route('/admin/index')
-def index():
+def _generic_index(retrieved_path):
     timer = Timer()
     timer.start()
-    retrieved_path = DOCUMENTS_DIR
+
     api = IndexingAPI(ELASTIC_URL, retrieved_path)
     response = api.bulk_add_documents_in_directory(retrieved_path, INDEX_NAME, DOCUMENT_TYPE).json()
     success = not response['errors']
@@ -141,14 +161,33 @@ def index():
     )
 
 
+@app.route('/admin/index/crude')
+def index():
+    return _generic_index(AFTER_CRAWL_BASE_DIR)
+
+
+@app.route('/admin/index/pagerank')
+def index_page_rank():
+    return _generic_index(PAGERANK_DESTINATION_DIRECTORY)
+
+
+@app.route('/admin/index/cluster')
+def index_cluster():
+    return _generic_index(CLUSTER_DESTINATION_DIRECTORY)
+
+
 def _get_cluster_data(cluster_id):
     with open(os.path.join(CLUSTER_CANDIDATE_TEXT_DIRECTORY, str(cluster_id) + '.json'), 'r') as fp:
-        return json.load(fp)
-    # return {"id": cluster_id, "name": "cluster {}".format(cluster_id)}
+        cluster_data = json.load(fp)
+        cluster_data['name'] = ' '.join(cluster_data['name'])
+        return cluster_data
 
 
 @app.route('/author/<name>')
 def get_author_cluster(name):
+    with open(AUTHOR_CLUSTER_FILE) as fo:
+        author_clusters = json.load(fo)
+
     if name in author_clusters and len(author_clusters[name]) > 1:
         return render_template('author_cluster.html', no_similar=False, cluster=author_clusters[name])
     else:
