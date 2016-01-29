@@ -21,6 +21,8 @@ class AuthorCrawler:
 
     def __init__(self):
         self.baseURL = 'https://www.researchgate.net/'
+        from progress.bar import IncrementalBar
+        self.progress_bar = IncrementalBar('Crawling', max=MIN_NUMBER_OF_PROFILE, suffix='%(percent)d%% %(remaining)s remaining - eta %(eta_td)s')
 
     def crawl(self):
         self.queueProfileURL.extend(START_PAGES)
@@ -28,17 +30,18 @@ class AuthorCrawler:
         while self.numberOfCrawlerProfile < MIN_NUMBER_OF_PROFILE:
             while len(self.queueProfileURL) == 0:
                 if len(self.queueArticleURL) == 0:
-                    print('finish')
+                    self.progress_bar.finish()
                     return
                 try:
                     self.queueProfileURL.extend(filter(lambda x: x not in self.visitedProfileURL and x not in self.queueProfileURL,self.getAuthorFromArticle(self.queueArticleURL.pop(0))))
                 except:
                     pass
             try:
+                self.progress_bar.next()
                 self.crawlProfile(self.queueProfileURL.pop(0))
             except:
                 pass
-        print('finish')
+        self.progress_bar.finish()
 
     def getAuthorFromArticle(self, url):
 
