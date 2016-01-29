@@ -34,6 +34,9 @@ class Node:
     def similarity(self, node):
         return len(self.articles & node.articles)
 
+    def get_similarity_ratio(self):
+        return self.similarity_value * 100.0 / len(self.articles)
+
     def __str__(self):
         if not self.children:
             author_ = self.authors.pop()
@@ -66,8 +69,8 @@ class Dendogram:
                 for j in range(i + 1, len(nodes)):
                     similarities.update({(i, j): nodes[i].similarity(nodes[j])})
 
-            min_value = max(similarities.values())
-            candidates = filter(lambda key: similarities[key] == min_value, similarities.keys())
+            max_value = max(similarities.values())
+            candidates = filter(lambda key: similarities[key] == max_value, similarities.keys())
             selected_key = choose_function(nodes, candidates)
             i = selected_key[0]
             j = selected_key[1]
@@ -80,18 +83,41 @@ class Dendogram:
 
         self.root_node = nodes[0]
 
+    def get_clusters(self, min_similarity_measure=0.2):
+        """
+        Thanks to vahid :-D
+
+        :param min_similarity_measure:
+        :return:
+        """
+        q = [self.root_node]
+        clusters = list()
+        while len(q) > 0:
+            n = q.pop()
+            print(n.get_similarity_ratio())
+            if n.children:
+                if n.get_similarity_ratio() < min_similarity_measure:
+                    clusters.append(n)
+                else:
+                    q += n.children
+            else:
+                clusters.append(n)
+
+        return clusters
+
+
 
 def main():
     from .author import Author
     authors = [
-        Author({'name': '', 'id': 0, 'papers': [1, 2, 3, 4]}),
-        Author({'name': '', 'id': 0, 'papers': [4, 5, 6, 7]}),
-        Author({'name': '', 'id': 0, 'papers': [1, 2, 6, 7]}),
-        Author({'name': '', 'id': 0, 'papers': [8, 9, 10, 21]}),
-        Author({'name': '', 'id': 0, 'papers': [2]}),
-        Author({'name': '', 'id': 0, 'papers': [16, 45, 11]}),
-        Author({'name': '', 'id': 0, 'papers': [11, 15, 22, 44]}),
-        Author({'name': '', 'id': 0, 'papers': [12, 22, 32, 42]}),
+        Author({'name': '', 'papers': [1, 2, 3, 4]}),
+        Author({'name': '', 'papers': [4, 5, 6, 7]}),
+        Author({'name': '', 'papers': [1, 2, 6, 7]}),
+        Author({'name': '', 'papers': [8, 9, 10, 21]}),
+        Author({'name': '', 'papers': [2]}),
+        Author({'name': '', 'papers': [16, 45, 11]}),
+        Author({'name': '', 'papers': [11, 15, 22, 44]}),
+        Author({'name': '', 'papers': [12, 22, 32, 42]}),
     ]
 
     for author in authors:

@@ -11,7 +11,7 @@
         <span class="authors">Authors:</span>
         <ol class="authors">
             {% for author in result._source.authors %}
-                <li>{{ author }}</li>
+                <li><a href="#" class="author-class" data-name="{{ author }}">{{ author }}</a></li>
             {% endfor %}
         </ol>
     </li>

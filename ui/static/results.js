@@ -62,3 +62,31 @@ $(function () {
 
     $('p.abstract>span.more').hide();
 });
+
+// Author clusters
+$(function () {
+    var cache = {};
+
+    $('.author-class').on('click', function (e) {
+        var self = $(this);
+        var name = self.data('name');
+        name = name.replace(/\//g, '');
+        $('.author-class').popover('hide');
+        if (cache[name]) {
+            self.popover('toggle');
+        } else {
+            $.ajax({
+                url: '/author/' + name,
+                success: function (ajax_result) {
+                    cache[name] = ajax_result;
+                    self.popover({
+                        html: true,
+                        content: ajax_result,
+                        placement: 'top'
+                    }).popover('toggle');
+                }
+            });
+        }
+        e.preventDefault();
+    });
+});

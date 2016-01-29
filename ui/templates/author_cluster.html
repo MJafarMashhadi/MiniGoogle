@@ -1,0 +1,10 @@
+{% if no_similar %}
+    <p>No similar authors found</p>
+{% else %}
+    <p>Some authors who are similar to this:</p>
+    <ol>
+    {% for author in cluster %}
+        <li>{{ author }}</li>
+    {% endfor %}
+    </ol>
+{% endif %}
